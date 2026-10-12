@@ -1,0 +1,22 @@
+
+.panel,.rail,.edition,.chapter,.copy p,.editorial-aside,.story-launch,.hint{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.copy{left:9%;top:30%;width:230px;pointer-events:none;transition:opacity .6s}
+.copy h1{font-size:clamp(38px,3.6vw,62px);line-height:.98;letter-spacing:-1.8px}
+body[data-experience=reveal] .copy,body[data-experience=explore] .copy{opacity:.48}
+.ray-identity{position:fixed;top:42px;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none;color:#394036;z-index:4}
+.ray-identity>span{font:20px Georgia,serif;letter-spacing:5px}.ray-identity small{display:block;margin-top:9px;font-size:8px;letter-spacing:2px}
+#system-navigation{position:fixed;right:5%;top:37%;z-index:8;display:flex;flex-direction:column;align-items:flex-start;gap:9px;opacity:0;visibility:hidden;transition:opacity .45s,visibility .45s}
+body[data-experience=explore] #system-navigation{opacity:1;visibility:visible}
+#system-navigation button{display:flex;align-items:center;gap:12px;min-height:44px;padding:8px 0;background:none;border:0;color:#303b31;font:11px 'DM Sans',sans-serif;letter-spacing:2px;opacity:.55;cursor:pointer;transition:opacity .3s}
+#system-navigation button span{font-size:10px;letter-spacing:1px}#system-navigation i{width:8px;height:1px;background:currentColor;transition:width .45s}#system-navigation button.active,#system-navigation button:hover{opacity:1}#system-navigation button.active i{width:36px}
+#system-navigation .portrait-overview{margin-top:20px;font-size:9px;letter-spacing:1.3px}
+.within-control{position:fixed;bottom:5%;left:50%;transform:translateX(-50%);z-index:10;display:flex;align-items:center;gap:28px;white-space:nowrap}
+.within-control button{display:flex;align-items:center;gap:15px;background:none;border:0;color:#24372d;min-height:48px;padding:5px 0;font:500 11px 'DM Sans',sans-serif;letter-spacing:2px;cursor:pointer}
+#hold-within{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}#hold-within svg{width:44px;height:44px;fill:none;stroke:currentColor;stroke-width:.8;overflow:visible}.orbit-base{opacity:.22}#hold-orbit{stroke-width:1.5;stroke-dasharray:113.1;stroke-dashoffset:113.1;transform:rotate(-90deg);transform-origin:center}.orbit-core{fill:currentColor;stroke:none}
+#explore-within,#return-ray{border-bottom:1px solid #32443866}#explore-within span,#return-ray span{font-size:20px;letter-spacing:0}.within-control [hidden]{display:none!important}
+.within-control button:focus-visible,#system-navigation button:focus-visible{outline:2px solid #345f51;outline-offset:6px}
+.marker{border:0!important;background:transparent!important;box-shadow:none!important;padding:0;gap:0;min-width:145px;min-height:95px;pointer-events:none!important}.marker:after,.marker-icon{display:none!important}.marker-name{font-size:10px;letter-spacing:2px;margin-bottom:8px}.marker-reading,#feetMark .marker-reading{font-size:46px;font-weight:400;letter-spacing:-1px}.marker-reading small{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin:5px 0 0}.movement-state{font-size:12px}.body-links path{stroke-width:.6;stroke:#41574a}
+@media(max-width:700px){.copy{left:22px;top:16%;width:150px}.copy h1{font-size:30px;letter-spacing:-.8px}.ray-identity{display:none}#system-navigation{right:22px;top:20%;gap:2px}#system-navigation button{font-size:9px;gap:8px;letter-spacing:1px}#system-navigation button.active i{width:18px}#system-navigation .portrait-overview{margin-top:9px;font-size:8px}.within-control{bottom:80px;gap:16px}.within-control button{font-size:9px;letter-spacing:1px;gap:8px}.within-control svg{width:34px!important}.marker{display:flex!important;min-width:110px;min-height:85px}.marker-name{font-size:9px;letter-spacing:1px}.marker-reading,#feetMark .marker-reading{font-size:34px}.marker-reading small{font-size:10px}.body-links{display:block}.bottom{bottom:15px}.profile-button{display:flex}}
+@media(prefers-reduced-motion:reduce){.copy,#system-navigation,#system-navigation i,#system-navigation button{transition:none}}
+.within-control button{color:#fff7e8;text-shadow:0 1px 5px #281d16}#explore-within,#return-ray{border-bottom-color:#fff7e899}.within-control button:focus-visible{outline-color:#fff7e8}

@@ -1,0 +1,13 @@
+# Keep Railway upload under size limits
+node_modules
+dist
+.git
+.DS_Store
+.env
+.env.*
+!.env.example
+*.log
+
+# Local backups only
+# Heavy marketing films / oversized marketing GLBs (app twin uses digital-twin/*.glb)
+public/site/assets/pawlink-supplied-original.glb

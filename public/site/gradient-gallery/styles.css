@@ -1,0 +1,124 @@
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+}
+
+:root {
+  --bg: #f0f0f0;
+  --fg: #0b0b0b;
+  --perspective: 1800px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.stage {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg);
+  color: var(--fg);
+  overflow: hidden;
+  perspective: var(--perspective);
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.loader {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  transition: opacity 0.2s var(--ease), visibility 0.2s linear;
+}
+.loader--hide {
+  opacity: 0;
+  visibility: hidden;
+}
+.loader__content {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  min-width: 220px;
+}
+.loader__ring {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #ddd;
+  border-top-color: #333;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+#bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: blur(24px) saturate(1.05);
+  pointer-events: none;
+}
+
+.stage.carousel-mode {
+  touch-action: none;
+  cursor: grab;
+}
+.stage.carousel-mode.dragging {
+  cursor: grabbing;
+}
+
+.cards {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  transform-style: preserve-3d;
+}
+
+.card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(26vw, 360px);
+  aspect-ratio: 4/5;
+  isolation: isolate;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, filter;
+  transform-origin: 90% center;
+  contain: layout paint; 
+}
+
+.card__img {
+  border-radius: 15px;
+  opacity: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: translateZ(0);
+  pointer-events: none;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none !important;
+    animation: none !important;
+  }
+}

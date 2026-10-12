@@ -1,0 +1,20 @@
+
+body:before{content:'';position:fixed;inset:0;background:linear-gradient(90deg,#2c271e44,transparent 38%,transparent 62%,#2c271e33);opacity:0;pointer-events:none;transition:opacity .8s;z-index:0}
+body[data-experience=explore]:before{opacity:1}
+.spatial-chapter{position:fixed;left:9%;top:20%;z-index:4;pointer-events:none;color:#343b30}.spatial-chapter>span{font-size:9px;letter-spacing:2px}.spatial-chapter p{font:italic 28px/1.1 Didot,Georgia,serif;margin:14px 0}
+.spatial-chapter[hidden],.scan-caption[hidden]{display:none}
+body[data-system]:not([data-system=overview]) .copy{opacity:.22;transform:translateY(60px)}.copy{transition:opacity .65s,transform .8s}
+.scan-caption{position:fixed;right:12%;top:27%;z-index:5;font-size:10px;letter-spacing:2px;max-width:160px;line-height:1.8;color:#35483c}
+.marker{min-width:185px;max-width:220px}.reading-context{display:block;font-size:10px;line-height:1.5;letter-spacing:.25px;margin-top:15px;max-width:190px;color:#3a483c}.reading-age{display:block;font-size:8px;letter-spacing:1.5px;margin-top:9px;color:#475347}.marker-name{letter-spacing:2px}.marker-reading{font-size:52px}
+body[data-system=water] .marker{--accent:#265c60}body[data-system=thermal] .marker{--accent:#80502f}body[data-system=steps] .marker{--accent:#354f3e}
+#system-navigation{top:20%;right:4%}#system-navigation button{font-size:10px}
+@media(max-width:700px){.spatial-chapter{top:12%;left:22px}.spatial-chapter p{font-size:20px;max-width:180px}.spatial-chapter>span{font-size:8px}body[data-system]:not([data-system=overview]) .copy{opacity:0}.scan-caption{right:22px;top:23%;font-size:8px;max-width:115px}.marker{min-width:150px;max-width:180px}.reading-context{display:none}.reading-age{font-size:7px;margin-top:6px}#system-navigation{top:18%;right:20px}.marker-reading{font-size:34px}}
+@media(prefers-reduced-motion:reduce){body:before,.copy{transition:none}}
+
+body[data-system]:not([data-system=overview]) .copy{opacity:0;visibility:hidden;transform:translateY(12px);transition:opacity .45s,transform .65s,visibility .45s}
+#feetMark .marker-reading{font-family:Didot,'Bodoni 72',Georgia,serif;font-size:64px;line-height:1.05;font-weight:400;letter-spacing:-1.8px;color:#30493d}
+#feetMark .marker-reading .digit-swap{letter-spacing:-1.8px}#feetMark .marker-reading small{font:10px 'DM Sans',sans-serif;letter-spacing:3px;margin-top:12px}#feetMark .movement-state{font:11px 'DM Sans',sans-serif;letter-spacing:2.4px;text-transform:uppercase;margin-top:13px}#feetMark .movement-state:before{display:none}#feetMark .reading-context{display:none}#feetMark .reading-age{margin-top:19px;letter-spacing:1.4px}#feetMark{max-width:260px;min-width:225px}
+#system-navigation button{font-size:11px;font-weight:500;letter-spacing:1.7px;color:#26362d;opacity:.76;text-shadow:0 1px 5px #fff8e8,0 0 12px #fff8e877}#system-navigation button.active{opacity:1}#system-navigation button.active span{font-weight:600}
+#return-ray{font-size:9px;letter-spacing:1.8px;opacity:.60;border-bottom-color:#fff7e844;transition:opacity .3s}#return-ray:hover,#return-ray:focus-visible{opacity:1}#return-ray span{font-size:16px}
+@media(max-width:700px){#feetMark .marker-reading{font-size:44px}#feetMark{min-width:180px;max-width:200px}#feetMark .marker-reading small{margin-top:5px}#feetMark .movement-state{margin-top:7px;font-size:10px}#feetMark .reading-age{margin-top:8px}#system-navigation button{font-size:10px;letter-spacing:1px}}
+@media(prefers-reduced-motion:reduce){body[data-system]:not([data-system=overview]) .copy,#return-ray{transition:none}}

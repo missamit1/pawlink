@@ -1,0 +1,7 @@
+
+export const SAFE_ZONE_CENTER_LAT = 32.0853
+export const SAFE_ZONE_CENTER_LNG = 34.7818
+
+export const SAFE_ZONE_RADIUS = 0.0015
+
+export const SAFE_ZONE_RADIUS_METERS = Math.round(SAFE_ZONE_RADIUS * 111320)

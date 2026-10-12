@@ -1,0 +1,27 @@
+
+.movement-picture{z-index:7;opacity:0}.movement-picture video{object-fit:cover;object-position:center bottom}
+#movementSense{position:absolute;inset:0;z-index:8;pointer-events:none;opacity:0;transition:opacity .6s}#movementSense canvas{display:block;width:100%;height:100%}
+.movement-readings{position:absolute;inset:0;z-index:9;pointer-events:none;color:#fff6e4;opacity:0;transition:opacity .6s;text-shadow:0 1px 14px #19160fcc}
+.cinema[data-phase=movement] #movementSense,.cinema[data-phase=movement] .movement-readings,.cinema[data-phase=ended] .movement-readings{opacity:1}
+.movement-edition,.movement-demo{position:absolute;top:35px;font-size:9px;letter-spacing:.16em}.movement-edition{left:4%}.movement-demo{right:4%;font-size:8px;opacity:.8}
+.reading{position:absolute;transition:opacity .8s,transform .8s}.reading>span{font-size:9px;letter-spacing:.17em;display:block;margin-bottom:11px}.reading strong{font-size:clamp(24px,3.5vw,49px);font-weight:400;letter-spacing:-.045em;line-height:1.1;display:block;font-variant-numeric:tabular-nums}.reading small{font-size:10px;letter-spacing:.05em;margin-left:6px}.heart{top:23%;left:4%;opacity:var(--heart-visible,0)}.activity{right:5%;top:47%;opacity:var(--activity-visible,0)}.temperature{left:4%;bottom:16%;opacity:var(--temperature-visible,0)}.new-reading #movementHeart{animation:reading-arrives .4s ease-out}
+.cinema:is([data-phase=outdoor],[data-phase=movement]) .cinema-top{opacity:0}.cinema:is([data-phase=outdoor],[data-phase=movement]) .cinema-bottom{opacity:0;color:#fff;z-index:12;transition:opacity .3s}.cinema .cinema-bottom{z-index:12}.cinema:is([data-phase=outdoor],[data-phase=movement]).controls-visible .cinema-bottom,.cinema:is([data-phase=outdoor],[data-phase=movement]) .cinema-bottom:focus-within{opacity:1}
+@keyframes reading-arrives{from{opacity:.45;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:700px){.movement-edition{left:6%;top:27px;font-size:8px}.movement-demo{right:6%;top:44px;font-size:7px}.reading>span{font-size:8px}.reading strong{font-size:32px}.heart{left:6%;top:21%}.activity{right:6%;top:44%}.temperature{left:6%;bottom:18%}}
+@media(prefers-reduced-motion:reduce){#movementSense{display:none}.reading,.movement-readings{transition:none}.new-reading #movementHeart{animation:none}}
+
+.reading{pointer-events:auto;text-align:left;padding:12px 15px;margin:-12px -15px;border:0;background:transparent;color:inherit;text-shadow:inherit;transform:translate(var(--sense-x,0px),var(--sense-y,0px));transition:opacity .35s,transform .35s,filter .35s}
+.reading::before{content:'';display:block;width:22px;height:2px;margin-bottom:16px;background:currentColor;opacity:calc(.28 + var(--signal-breath,.5)*.3);transition:width .4s}
+.reading[aria-pressed=true]::before{width:64px}.reading[aria-pressed=true] strong{transform:scale(1.12);transform-origin:left center}.reading strong{transition:transform .35s}.reading:hover::before{width:45px}
+.cinema[data-signal-focus=heart] .reading:not(.heart),.cinema[data-signal-focus=activity] .reading:not(.activity),.cinema[data-signal-focus=temperature] .reading:not(.temperature){filter:blur(.8px);opacity:.27}
+.reading .step-rhythm{display:block;font-size:9px;letter-spacing:.18em;margin-top:20px;margin-bottom:0;opacity:.7;font-variant-numeric:tabular-nums}
+.sense-hint{position:absolute;bottom:6%;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.16em;opacity:.65;white-space:nowrap}
+@media(max-width:700px){.sense-hint{bottom:12%;font-size:7px}.reading::before{margin-bottom:12px}.reading .step-rhythm{font-size:8px;margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.reading{transform:none!important;transition:none}.reading::before{opacity:.6}}
+.cinema[data-signal-focus=heart] .activity,.cinema[data-signal-focus=temperature] .activity{opacity:calc(var(--activity-visible,0)*.27)}
+.cinema[data-signal-focus=heart] .temperature,.cinema[data-signal-focus=activity] .temperature{opacity:calc(var(--temperature-visible,0)*.27)}
+.cinema[data-signal-focus=activity] .heart,.cinema[data-signal-focus=temperature] .heart{opacity:calc(var(--heart-visible,0)*.27)}
+
+.reading strong{font-size:clamp(30px,4.15vw,59px)}
+.reading>span{font-size:10px}.reading small{font-size:12px}
+@media(max-width:700px){.reading strong{font-size:38px}.reading>span{font-size:9px}.reading small{font-size:11px}}

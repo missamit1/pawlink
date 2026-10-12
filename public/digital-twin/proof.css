@@ -1,0 +1,4 @@
+#persistent-safety,.safety-origin,#system-navigation,.marker,.body-links,.spatial-chapter,.scan-caption,.utility,.bottom,.panel,.rail,#hold-within,.ray-identity{display:none!important}
+#proof-cue{position:fixed;left:50%;bottom:5%;transform:translateX(-50%);text-align:center;font:10px/1.9 'DM Sans',sans-serif;letter-spacing:2px;color:#fff4df;text-shadow:0 1px 6px #362e22;pointer-events:none;transition:opacity .5s}#proof-cue span{font-size:8px}#proof-cue.discovered{opacity:.25}body[data-experience=explore] #proof-cue{opacity:0}.within-control{bottom:4%}canvas:focus-visible{outline:1px solid #436b58;outline-offset:-8px}
+
+body.proof-capture .brand,body.proof-capture .copy,body.proof-capture #proof-cue,body.proof-capture .within-control{display:none!important}

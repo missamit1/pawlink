@@ -1,0 +1,17 @@
+
+.pl-media-host{position:relative}
+.pl-media-controls{display:none!important;position:absolute;z-index:12;left:20px;top:20px;display:flex;align-items:center;gap:14px;padding:8px 12px;background:#f6f1e9ed;color:#482431;border:1px solid #48243140;border-radius:3px;font:12px Arial,sans-serif}
+.pl-media-controls button{background:transparent;color:inherit;border:0;min-height:32px;cursor:pointer;font:inherit;white-space:nowrap}
+.pl-media-controls label{display:flex;align-items:center;gap:8px;font:inherit}
+.pl-media-controls input{width:80px;accent-color:#482431;min-height:32px;cursor:pointer}
+.pl-three-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:40px;margin:50px 0 40px}
+.pl-three-steps article{border-top:1px solid #41372d30;padding-top:18px}
+.pl-three-steps article>span{font:10px monospace;letter-spacing:.08em}
+.pl-three-steps h3{font-size:clamp(24px,2.4vw,38px)!important;line-height:1.15!important;margin:24px 0 16px!important}
+.pl-three-steps p{max-width:34ch;font-size:16px;line-height:1.6}
+.pl-case-note{border-top:1px solid #41372d30;padding:20px 0 8px}
+.pl-case-note h3{font:11px monospace!important;letter-spacing:.04em;margin:0 0 12px!important}
+@media(max-width:700px){.pl-media-controls{top:12px;left:12px;gap:10px;padding:5px 10px}.pl-media-controls button{min-height:38px}.pl-media-controls input{width:65px;min-height:38px}.pl-three-steps{grid-template-columns:1fr;gap:24px;margin:32px 0}.pl-three-steps h3{margin:16px 0 10px!important}.pl-three-steps p{max-width:none}}
+
+/* Hero uses the site Sound button only — no overlay chrome */
+.hero .pl-media-controls,.hero-film .pl-media-controls{display:none!important}

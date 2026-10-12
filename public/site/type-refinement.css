@@ -1,0 +1,17 @@
+
+:root{--type-display:'Bodoni Moda',Georgia,serif;--type-reading:'DM Sans',Arial,sans-serif;--type-caption:'Courier New',monospace}
+body{font-family:var(--type-reading)}
+:is(.hero h1,.twin-heading h2,.home-story h2,.pl-journal-heading h2,.pl-signup-content>h2){font-family:var(--type-display);font-weight:400;letter-spacing:-.045em;line-height:1.06}
+:is(.ed-intro-grid h2,.ed-case-grid h2,.inside-project>h2,.pl-details-heading h2){font-family:var(--type-reading)!important;font-weight:400;font-size:clamp(35px,4.4vw,70px);letter-spacing:-.055em;line-height:1.08}
+:is(.ed-intro-grid h2,.ed-case-grid h2,.inside-project>h2,.pl-details-heading h2) em{font-style:normal}
+:is(.pl-moment-copy h3,.meaning-story h3,.twin-insight h3){font-family:var(--type-reading)!important;font-weight:400;font-size:clamp(28px,3.1vw,48px);letter-spacing:-.045em;line-height:1.15}
+.pl-moment-copy h3 em{font-style:normal}
+:is(.ed-intro-grid,.ed-case-grid,.pl-moment-copy,.home-story,.twin-heading,.pl-details-heading) p{font-family:var(--type-reading)!important;font-weight:400;font-size:clamp(15px,1.15vw,18px);line-height:1.6;letter-spacing:-.015em;max-width:43ch}
+:is(.eyebrow,.quiet-label,.scene-folio,.pl-folio,.pl-kicker,.pl-small-caption,.pl-signup-eyebrow,.pl-signup-folio,.ed-folio,.ed-margin,.twin-view-label,.edition,.pl-day-nav a,.pl-moment figcaption,.pl-detail>span){font-family:var(--type-caption)!important;font-size:10px;font-weight:400;line-height:1.5;letter-spacing:0;text-transform:uppercase}
+.pl-journal-heading>p{font:11px/1.5 var(--type-caption);font-style:normal;letter-spacing:0;text-transform:uppercase;max-width:23ch}
+.pl-journal-heading>span,.pl-signup-intro{font-family:var(--type-reading)!important;line-height:1.6;letter-spacing:-.015em}
+:is(.ed-link,.inside-link,.pl-text-link,.pl-route-caption,.pl-film-toggle,.pl-signup-next,.pl-signup-back){font-family:var(--type-reading)!important;font-size:12px;letter-spacing:0}
+.pl-route nav a{font-family:var(--type-reading)!important;font-size:22px;letter-spacing:-.035em}.pl-route h2{font-family:var(--type-display)}
+.pl-signup-content legend{font-family:var(--type-reading)!important;letter-spacing:-.04em}.pl-signup-content legend em{font-style:normal}
+.ed-intro-grid .ed-lead{font-size:20px;line-height:1.45;letter-spacing:-.025em}.pl-signup-stamp{font-family:var(--type-display)}
+@media(max-width:700px){:is(.ed-intro-grid h2,.ed-case-grid h2,.inside-project>h2,.pl-details-heading h2){font-size:10vw}:is(.pl-moment-copy h3,.meaning-story h3,.twin-insight h3){font-size:8vw}:is(.eyebrow,.quiet-label,.scene-folio,.pl-folio,.pl-kicker,.pl-small-caption,.pl-signup-folio,.ed-folio,.ed-margin,.pl-day-nav a,.pl-moment figcaption){font-size:9px}:is(.ed-intro-grid,.ed-case-grid,.pl-moment-copy,.home-story,.twin-heading,.pl-details-heading) p{font-size:15px}.pl-route nav a{font-size:19px}}

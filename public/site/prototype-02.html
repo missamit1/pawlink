@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f6f4ef"><title>PawLink — Movement / Prototype 02</title><link rel="icon" href="favicon.svg"><link rel="stylesheet" href="prototype-01.css"><link rel="stylesheet" href="prototype-02.css"></head>
+<body>
+<header class="masthead"><a href="#top" class="wordmark">pawlink<sup>®</sup></a><span>A LITTLE CLOSER.</span><button id="sound" data-sound aria-pressed="false">Enable original sound</button></header>
+<main id="top">
+<section class="opening" aria-labelledby="opening-title"><p class="eyebrow">PAWLINK / THE SMART COLLAR</p><h1 id="opening-title">Their world.<br>Closer to yours.</h1><div class="opening-bottom"><span>A little more understanding.<br>A whole lot of love.</span><a id="begin" href="#experience">Enter with sound <span>↓</span></a></div></section>
+<section id="experience" class="experience" aria-label="From their world into Ray’s perspective"><div class="cinema" data-phase="idle">
+<div class="picture campaign-picture"><video id="campaign" muted playsinline preload="auto" poster="assets/film-0.jpg" aria-label="The full PawLink campaign: real dogs exploring the camera"><source src="assets/pawlink-film.mp4" type="video/mp4"></video></div>
+<div class="picture ray-picture"><video id="ray" muted playsinline preload="metadata" aria-label="Ray approaches the camera, then the camera discovers the collar and its status light"><source src="assets/ray/approach.mp4" type="video/mp4"></video></div>
+<div id="light" aria-hidden="true"></div><div id="ivory" aria-hidden="true"></div>
+<div class="connection" aria-live="polite" aria-atomic="true"><span class="connection-label">PAWLINK</span><i class="status-dash" aria-hidden="true"></i><div id="connectionWords"></div><span class="connection-note">AN ILLUSTRATIVE CONNECTION</span></div>
+<div class="picture pov-picture"><video id="pov" muted playsinline preload="none" aria-label="Ray’s first-person view through a warm architectural space, with the PawLink collar intentionally visible at the bottom"><source src="assets/ray/first-pov.mp4" type="video/mp4"></video></div>
+
+<div class="picture movement-picture"><video id="movement" muted playsinline preload="none" aria-label="Ray’s first-person movement along a sunlit outdoor path"><source src="assets/ray/movement.mp4" type="video/mp4"></video></div>
+
+<div class="movement-readings" aria-label="Illustrative movement telemetry"><span class="movement-edition">02 / IN MOTION</span><span class="sense-hint">TOUCH A SIGNAL. FEEL THE RHYTHM.</span><span class="movement-demo">SIMULATED SIGNALS · NOT LIVE READINGS</span><button type="button" class="reading heart" data-focus="heart" aria-pressed="false" aria-label="Focus on heart signal"><span>HEART RATE</span><strong id="movementHeart">82 <small>BPM</small></strong></button><button type="button" class="reading activity" data-focus="activity" aria-pressed="false" aria-label="Focus on activity signal"><span>ACTIVITY</span><strong id="movementActivity">Walking</strong><span id="stepRhythm" class="step-rhythm" aria-hidden="true">STEP / 001</span></button><button type="button" class="reading temperature" data-focus="temperature" aria-pressed="false" aria-label="Focus on temperature signal"><span>BODY TEMPERATURE</span><strong id="movementTemperature">38.3 <small>°C</small></strong></button></div>
+<div class="cinema-top"><span class="cinema-brand">pawlink</span><span id="sceneName">THEIR WORLD</span></div>
+<div class="cinema-bottom"><button id="cinemaSound" data-sound aria-pressed="false">Enable sound</button><button id="play" aria-label="Play film">Play film</button><span id="invitation">Let them come to you.</span><button id="enter" hidden>Enter PawLink <span>↗</span></button><button id="replay" hidden>Experience it again ↺</button></div>
+<p id="mediaError" role="status" hidden>The film couldn’t load. Please reload to try again.</p>
+</div></section>
+<div class="end-note"><span>PAWLINK / PROTOTYPE 02</span><span>STILL HIM. JUST CLOSER TO YOU.</span><a href="prototype-01.html">Prototype 01 ↗</a></div>
+</main><script type="module" src="prototype-02.js"></script></body></html>

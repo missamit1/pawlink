@@ -1,0 +1,376 @@
+
+
+.my-dogs {
+  --cream: #f3ebe2;
+  --ink: #2a1814;
+  --muted: #7a655c;
+  --wine: #5c1c1c;
+  --wine-deep: #3d1010;
+  --serif: "Cormorant Garamond", "Baskerville", "Times New Roman", serif;
+  --sans: "Outfit", system-ui, sans-serif;
+
+  min-height: 100svh;
+  color: var(--ink);
+  background: var(--cream);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+}
+
+.my-dogs *,
+.my-dogs *::before,
+.my-dogs *::after {
+  box-sizing: border-box;
+}
+
+.my-dogs__header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.35rem clamp(1.25rem, 3vw, 2.75rem);
+  background: var(--cream);
+}
+
+.my-dogs__logo {
+  flex-shrink: 0;
+  color: inherit;
+  text-decoration: none;
+  font-size: clamp(1.85rem, 2.4vw, 2.35rem);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.my-dogs__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 2.5rem);
+  margin-left: auto;
+  font-family: var(--sans);
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.my-dogs__nav-item.is-active {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.35em;
+  text-decoration-thickness: 1px;
+}
+
+.my-dogs__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: calc(100svh - 5rem);
+}
+
+.my-dogs__panel {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem clamp(1.5rem, 4vw, 4.5rem) 2.5rem;
+  background: var(--cream);
+}
+
+.my-dogs__eyebrow {
+  margin: 0 0 0.85rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.my-dogs__panel h1 {
+  margin: 0 0 2.25rem;
+  max-width: 14ch;
+  font-size: clamp(2.4rem, 4.2vw, 3.55rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.my-dogs__status {
+  margin: 0 0 1rem;
+  font-family: var(--sans);
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.my-dogs__status--error {
+  color: #8a2424;
+}
+
+.my-dogs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgb(42 24 20 / 12%);
+}
+
+.my-dogs__row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  min-height: 4.35rem;
+  padding: 0.65rem 0.55rem;
+  border: 0;
+  border-bottom: 1px solid rgb(42 24 20 / 12%);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.my-dogs__row.is-selected {
+  background: rgb(42 24 20 / 5%);
+}
+
+.my-dogs__avatar {
+  width: 2.65rem;
+  height: 2.65rem;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 0.35rem;
+}
+
+.my-dogs__name {
+  flex: 1;
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.my-dogs__selected-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--sans);
+  font-size: 0.78rem;
+  color: var(--ink);
+}
+
+.my-dogs__selected-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--wine);
+}
+
+.my-dogs__add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  align-self: flex-start;
+  margin-top: 1.35rem;
+  padding: 0.35rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.my-dogs__add:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.my-dogs__add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: min(100%, 22rem);
+  margin-top: 1.35rem;
+}
+
+.my-dogs__add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.my-dogs__add-field input,
+.my-dogs__add-field select {
+  min-height: 2.6rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgb(42 24 20 / 18%);
+  border-radius: 0.45rem;
+  background: rgb(255 255 255 / 55%);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.my-dogs__add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.my-dogs__add-actions button {
+  min-height: 2.5rem;
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 0.4rem;
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.my-dogs__add-actions button[type='submit'] {
+  background: var(--ink);
+  color: #f7efe7;
+}
+
+.my-dogs__add-actions button[type='button'] {
+  background: transparent;
+  color: var(--muted);
+  text-decoration: underline;
+}
+
+.my-dogs__add-icon {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1px solid rgb(42 24 20 / 28%);
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.my-dogs__continue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  width: min(100%, 18rem);
+  min-height: 3.35rem;
+  margin-top: auto;
+  padding: 0.85rem 1.5rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: var(--ink);
+  color: #f7efe7;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+}
+
+.my-dogs__continue:hover {
+  background: #1f110e;
+}
+
+.my-dogs__stage {
+  position: relative;
+  overflow: hidden;
+  background: var(--wine-deep);
+  color: #f7efe7;
+}
+
+.my-dogs__stage-empty {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 40%, #6a2a2a 0%, transparent 55%),
+    var(--wine-deep);
+}
+
+.my-dogs__hero {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.my-dogs__stage-note {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.35rem;
+  z-index: 2;
+  margin: 0;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-family: var(--sans);
+  font-size: 0.62rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(247 239 231 / 78%);
+}
+
+.my-dogs__stage-note::after {
+  display: block;
+  width: 1px;
+  height: 2.5rem;
+  margin-top: 0.85rem;
+  margin-inline: auto;
+  background: rgb(247 239 231 / 55%);
+  content: "";
+}
+
+.my-dogs__stage-caption {
+  position: absolute;
+  left: clamp(1.25rem, 3vw, 2.5rem);
+  bottom: clamp(1.5rem, 4vh, 2.75rem);
+  z-index: 2;
+}
+
+.my-dogs__stage-caption h2 {
+  margin: 0;
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+}
+
+.my-dogs__stage-rule {
+  display: block;
+  width: 4.5rem;
+  height: 1px;
+  margin-top: 0.85rem;
+  background: rgb(255 255 255 / 85%);
+}
+
+@media (max-width: 900px) {
+  .my-dogs__nav {
+    display: none;
+  }
+
+  .my-dogs__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .my-dogs__stage {
+    min-height: 48svh;
+    order: -1;
+  }
+
+  .my-dogs__panel {
+    min-height: auto;
+    padding-bottom: 2rem;
+  }
+
+  .my-dogs__continue {
+    width: 100%;
+    margin-top: 2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .my-dogs__row {
+    transition: none;
+  }
+}

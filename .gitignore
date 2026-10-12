@@ -1,0 +1,13 @@
+node_modules/
+dist/
+!public/digital-twin/dist/
+!public/digital-twin/dist/**
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+**/_model_backups/**
+public/site/assets/pawlink-supplied-original.glb
+public/_model_backups/
+dist-safezone-test/

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Safe Zone Membrane — Place · Expand · Set</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div id="map" aria-label="Build Ray a safe space"></div>
+
+    <aside class="chrome" aria-live="polite">
+      <p class="chrome__brand">PawLink</p>
+      <p class="chrome__kicker" id="phase-kicker">Location · Place Home</p>
+      <p class="chrome__place" id="place">Tap the map to place Home</p>
+      <p class="chrome__meters" id="meters" hidden>—</p>
+      <p class="chrome__readout" id="readout">Where should Ray come home to?</p>
+    </aside>
+
+    <div class="actions" id="actions">
+      <button type="button" class="actions__ghost" id="btn-locate" hidden>
+        Use my location
+      </button>
+      <button type="button" class="actions__set" id="btn-set" hidden>
+        Set safe space
+      </button>
+      <button type="button" class="actions__ghost" id="btn-reset" hidden>
+        Start over
+      </button>
+    </div>
+
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+
+.system-annotation{position:fixed;left:0;top:0;width:230px;z-index:5;pointer-events:none;color:var(--pl-ink)}
+.system-annotation[hidden]{display:none}
+.system-annotation .annotation-index{color:var(--pl-ink)}
+.system-annotation .annotation-reading small{color:var(--pl-ink)}
+.system-annotation .annotation-statement{margin:18px 0 0;white-space:normal}
+.system-note{font:10px/1.6 'DM Sans',sans-serif;max-width:200px;color:var(--pl-secondary);margin:17px 0 0}
+.system-note:empty,.system-activity-state:empty{display:none}
+.system-relationship{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.system-relationship path{fill:none;stroke:var(--pl-ink);stroke-width:.55;opacity:.82}
+.system-relationship circle{fill:var(--pl-ink)}
+.system-water{width:215px}.system-water .annotation-statement{font-size:26px;max-width:180px;line-height:1.2}.system-water .annotation-reading{margin-top:22px;font-size:49px}
+.system-steps{width:280px}.system-steps .annotation-statement{font-size:23px}.system-steps .annotation-reading{font-size:52px;gap:12px}.system-activity-state{font:11px 'DM Sans',sans-serif;letter-spacing:1.8px;margin-top:15px}
+.system-thermal{width:225px}.system-thermal .annotation-statement{font-size:22px;order:2}.system-thermal .annotation-reading{font-size:44px}.system-thermal{display:flex;flex-direction:column}.system-thermal .annotation-index{order:0}.system-thermal .annotation-reading{order:1}.system-thermal .system-note{order:3}.system-thermal .annotation-meta{order:4}
+@media(max-width:700px){.system-annotation{width:175px}.system-steps{width:220px}.system-annotation .annotation-reading{font-size:37px}.system-annotation .annotation-statement{font-size:20px}.system-note{font-size:9px;max-width:175px}}
+.system-annotation .digit-swap-slot.punctuation{width:.22em}

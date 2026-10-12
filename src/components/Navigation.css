@@ -1,0 +1,120 @@
+
+
+.location-editorial-stage .paw-panel__nav {
+  position: absolute;
+  top: 10.34%;
+  left: 8.28%;
+  width: 51.32%;
+}
+
+.location-editorial-stage .paw-panel__nav ol {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.location-editorial-stage .paw-panel__nav ol::before {
+  content: '';
+  position: absolute;
+  top: 2.65cqw;
+  left: 3.48cqw;
+  width: 0.33cqw;
+  height: 77.65cqw;
+  background: linear-gradient(
+    to bottom,
+    #cda68b 0%,
+    #d9b69a 67%,
+    rgba(211, 171, 139, 0.12) 100%
+  );
+}
+
+.location-editorial-stage .paw-panel__nav ol::after {
+  content: '';
+  position: absolute;
+  left: 3.15cqw;
+  top: 79.8cqw;
+  width: 0.99cqw;
+  height: 0.99cqw;
+  border-radius: 50%;
+  background: #c6977e;
+}
+
+.location-editorial-stage .paw-panel__nav-item {
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 15.48cqw;
+  padding: 0 0 0 10.93cqw;
+  border: 0;
+  background: transparent;
+  color: #c5a991;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: var(--sans);
+}
+
+.location-editorial-stage .nav-number {
+  flex: 0 0 10.43cqw;
+  color: #ac907a;
+  font-size: 3.48cqw;
+  font-weight: 500;
+  letter-spacing: 0.16cqw;
+}
+
+.location-editorial-stage .nav-label {
+  font-size: 3.81cqw;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.66cqw;
+  text-transform: uppercase;
+}
+
+.location-editorial-stage .nav-pearl {
+  position: absolute;
+  left: 2.15cqw;
+  width: 2.81cqw;
+  height: 2.81cqw;
+  border: 0.41cqw solid #e4c9b3;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 34% 27%,
+    #ebc6b7,
+    #c69086 50%,
+    #9f6862 100%
+  );
+  box-shadow:
+    0 0 1.15cqw rgba(255, 225, 192, 0.45),
+    inset 0 0 0.5cqw rgba(255, 244, 218, 0.5);
+}
+
+.location-editorial-stage .paw-panel__nav .is-active .nav-label,
+.location-editorial-stage .paw-panel__nav .is-active .nav-number {
+  color: #fff2e1;
+}
+
+.location-editorial-stage .paw-panel__nav .is-active .nav-pearl {
+  left: 0;
+  width: 7.12cqw;
+  height: 7.12cqw;
+  border: 0.66cqw solid #fff1d8;
+  background: radial-gradient(
+    circle at 35% 24%,
+    #cc8c7c 0%,
+    #a55b50 23%,
+    #7a322e 55%,
+    #481b1b 100%
+  );
+  box-shadow:
+    0 0 1.65cqw rgba(255, 228, 193, 0.85),
+    0 0 4.14cqw rgba(245, 186, 142, 0.35),
+    inset 0 0.33cqw 0.83cqw rgba(255, 223, 187, 0.3);
+}
+
+.location-editorial-stage .paw-panel__nav-item:focus-visible {
+  outline: none;
+  color: #fff2e1;
+}

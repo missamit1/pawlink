@@ -1,0 +1,65 @@
+:root {
+  --text: #2a2420;
+  --text-h: #1a1614;
+  --bg: #f3ebe2;
+  --border: #d5cdc0;
+  --code-bg: #efe7dc;
+  --accent: #c45c5a;
+  --accent-bg: rgba(196, 92, 90, 0.12);
+  --accent-border: rgba(196, 92, 90, 0.45);
+  --shadow: rgba(60, 35, 25, 0.12) 0 18px 40px;
+
+  --sans: Outfit, system-ui, sans-serif;
+  --heading: 'Cormorant Garamond', Georgia, serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 16px/145% var(--sans);
+  letter-spacing: 0.01em;
+  color-scheme: light;
+  color: var(--text);
+  background: var(--bg);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--bg);
+}
+
+#root {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  text-align: left;
+  border: 0;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  width: 100%;
+}

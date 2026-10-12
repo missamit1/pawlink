@@ -1,0 +1,23 @@
+
+
+.header-actions{display:flex;align-items:center;gap:14px}
+.navlink-login{background:#4c2634!important;color:#faf5ec!important;border:0!important;border-radius:999px;padding:10px 18px!important}
+.navlink-login span{margin-left:12px}
+.navlink-quiet{background:transparent}
+.pl-app-gate{display:grid;gap:14px;margin:28px 0 8px;max-width:34rem}
+.pl-app-login,.pl-app-signup{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;padding:16px 20px;border-radius:999px;text-decoration:none;font:500 15px/1.2 'DM Sans',sans-serif}
+.pl-app-login{background:#4c2634;color:#faf5ec}
+.pl-app-signup{background:transparent;color:#4c2634;border:1px solid #4c263445}
+.pl-app-gate-note{margin:0;font:12px/1.5 'DM Sans',sans-serif;opacity:.72;max-width:36ch}
+.pl-finale-login{margin-bottom:10px}
+@media(max-width:700px){
+  .header-actions{gap:8px}
+  .navlink-login{padding:8px 12px!important;font-size:12px}
+  .navlink-quiet{display:none}
+}
+
+.masthead-login{font:11px/1 'DM Sans',sans-serif;letter-spacing:.08em;margin-right:18px;text-decoration:none;color:inherit;border-bottom:1px solid currentColor;padding-bottom:4px}
+.masthead .masthead-login{align-self:center}
+
+.navlink-open-app,.pl-app-open{letter-spacing:.02em}
+html[data-pawlink-session=in] .navlink-login{background:#4c2634!important}
