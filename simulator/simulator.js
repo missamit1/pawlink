@@ -2,38 +2,40 @@ import { loadRootEnv, requireDemoDogId } from '../lib/loadRootEnv.js'
 
 loadRootEnv(import.meta.url)
 
-// Same process as the API (production/dev). Railway sets PORT ≠ 3001.
-const API_BASE = `http://127.0.0.1:${Number(process.env.PORT) || 3001}`
-
 let DEMO_DOG_ID
 try {
   DEMO_DOG_ID = requireDemoDogId('simulator')
   console.log('[simulator] DEMO_DOG_ID loaded (prefix)', DEMO_DOG_ID.slice(0, 8))
-  console.log('[simulator] API_BASE', API_BASE)
 } catch (err) {
   console.error(err.message)
   process.exit(1)
 }
 
+// Same process as the API — use live PORT (3001 local, 8080 on Railway).
+const API_PORT = Number(process.env.PORT) || 3001
+const API_BASE = `http://127.0.0.1:${API_PORT}`
+
 function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Start at home (resting) so a fresh deploy / SET never opens with Ray far outside.
-let activityState = 'resting'
+// let = קופסה שאפשר לשנות בהמשך (לא קבוע כמו const)
+let activityState = 'running'
 
+// מתי התחיל המצב הנוכחי (מספר מילישניות מ־1970)
 let stateStartedAt = Date.now()
 
+// הצגה: מספיק זמן לצאת מהעיגול ולחזור ברגל
 const MIN_STATE_MS = 25 * 1000
 
 const injectAnomaly = false
 
-// Prefer time inside the zone; brief running breaches still demo safe_zone alerts.
+// לולאת הצגה: בפנים → רץ החוצה → הולך הביתה → נח → שוב
 const allowedNext = {
   sleeping: ['resting'],
-  resting: ['resting', 'sleeping', 'walking'],
-  walking: ['resting', 'walking', 'running'],
-  running: ['walking', 'resting'],
+  resting: ['walking'],
+  walking: ['running'],
+  running: ['walking'],
 }
 
 let runDirLat = 1
@@ -56,9 +58,11 @@ function maybeChangeState() {
 
   activityState = nextState
   stateStartedAt = Date.now()
-  console.log('[simulator] state:', activityState)
+  console.log('🔄 State changed to:', activityState)
 }
 
+
+// טווח מספרים לכל מצב (מינימום, מקסימום)
 const stateRanges = {
   sleeping: {
     heart_rate: [50, 65],
@@ -86,11 +90,15 @@ const stateRanges = {
   }
 }
 
+// הערכים החיים — מתחילים מריצה, ואז זזים לאט
 let currentHeartRate = 120
 let currentActivity = 200
 let currentTemperature = 385
 let currentHydration = 70
 
+// בית דמו — מתחיל בתל אביב, ואז מתעדכן מ־safe_zone שנשמר ב־SET
+// יחידות × 10000 כדי להשתמש ב־takeSmallStep
+// 32.0853 → 320853 | 34.7818 → 347818
 let HOME_LAT = 320853
 let HOME_LNG = 347818
 let HOME_RADIUS_UNITS = 26
@@ -115,16 +123,19 @@ async function refreshHomeFromSafeZone() {
     HOME_RADIUS_UNITS = nextRadius
   }
   if (nextLat === HOME_LAT && nextLng === HOME_LNG) return
-  // New Home always re-anchors Ray — never leave a stale GPS outside the zone.
+  const farFromNewHome =
+    Math.hypot(currentLatitude - nextLat, currentLongitude - nextLng) >
+    HOME_RADIUS_UNITS * 8
   HOME_LAT = nextLat
   HOME_LNG = nextLng
-  currentLatitude = HOME_LAT
-  currentLongitude = HOME_LNG
-  activityState = 'resting'
-  stateStartedAt = Date.now()
-  console.log('[simulator] home synced + Ray re-anchored:', HOME_LAT, HOME_LNG)
+  if (farFromNewHome) {
+    currentLatitude = HOME_LAT
+    currentLongitude = HOME_LNG
+  }
+  console.log('🏠 Home synced from safe_zone:', HOME_LAT, HOME_LNG)
 }
 
+// צעד קטן לכיוון יעד — לא קפיצה גדולה
 function takeSmallStep(current, min, max, stepSize) {
   const goal = randomBetween(min, max)
 
@@ -148,14 +159,14 @@ function stepToward(current, target, stepSize) {
 function updateLocationForState() {
   const radius = Math.max(HOME_RADIUS_UNITS, 12)
 
-  
+  // ישן / נח: הולך הביתה לאט — בלי קפיצה
   if (activityState === 'sleeping' || activityState === 'resting') {
     currentLatitude = stepToward(currentLatitude, HOME_LAT, 4)
     currentLongitude = stepToward(currentLongitude, HOME_LNG, 4)
     return
   }
 
-  
+  // הולך: חוזר לפנים העיגול
   if (activityState === 'walking') {
     const inside = radius * 0.45
     currentLatitude = stepToward(
@@ -171,9 +182,8 @@ function updateLocationForState() {
     return
   }
 
-  
-  // Just past the membrane — readable breach, not a different neighborhood.
-  const outside = radius * 1.15
+  // רץ: יוצא מעבר לגבול
+  const outside = radius * 1.55
   currentLatitude = stepToward(
     currentLatitude,
     HOME_LAT + runDirLat * outside,
@@ -256,7 +266,7 @@ async function sendTelemetry() {
   maybeChangeState()
   const telemetry = generateTelemetry()
 
-  console.log('[simulator] telemetry:', telemetry)
+  console.log('🐕 Sending telemetry:', telemetry)
 
   try {
     const response = await fetch(`${API_BASE}/api/telemetry`, {
@@ -269,7 +279,7 @@ async function sendTelemetry() {
 
     const result = await response.json()
 
-    console.log('[simulator] response:', result)
+    console.log('📡 Server response:', result)
   } catch (err) {
     console.log('TELEMETRY SKIP:', err.message)
   }
