@@ -123,6 +123,26 @@ const footprints=[];function footprint(pos){const group=new T.Group(),mat=glowMa
 let activePose='walking',requestedPose=null,poseRequest=0;let heartBone,heartOffset,ribOffset,heartRotation=new T.Quaternion(),ribRotation=new T.Quaternion(),feet=[];const chestRotation=new T.Quaternion();const heartPos=new T.Vector3(-.030,.443,.052),footPos=new T.Vector3(),lastPhases=[0,0,0,0];
 const modelFiles={walking:'./dog.glb',sleeping:'./sleeping.glb',resting:'./resting.glb'};
 function disposeDog(object){if(!object)return;object.traverse(o=>{if(o.isMesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){for(const value of Object.values(m))if(value?.isTexture)value.dispose();m.dispose();}}});}
+/** Three PropertyBinding treats `:` as reserved — `tripo::Spine_0` tracks never bind, so Ray freezes. */
+function sanitizeGltfAnimationNames(root,animations=[]){
+ const rename=new Map();
+ root.traverse(o=>{
+  if(!o.name||!o.name.includes(':'))return;
+  const next=o.name.replaceAll(':','');
+  rename.set(o.name,next);
+  o.name=next;
+ });
+ for(const clip of animations){
+  for(const track of clip.tracks){
+   const dot=track.name.indexOf('.');
+   if(dot<0)continue;
+   const node=track.name.slice(0,dot);
+   const prop=track.name.slice(dot);
+   const next=rename.get(node)??(node.includes(':')?node.replaceAll(':',''):null);
+   if(next)track.name=next+prop;
+  }
+ }
+}
 async function switchPose(state){
  // Missing state must not kill a live gait (empty host push used to set timeScale=0).
  if(!state){if(mixer&&telemetry.activity_state)mixer.timeScale=1;return;}
@@ -135,6 +155,7 @@ async function switchPose(state){
  try{
  const g=await new GLTFLoader().loadAsync(modelFiles[pose]);
  if(token!==poseRequest){disposeDog(g.scene);return;}
+ sanitizeGltfAnimationNames(g.scene,g.animations);
  const old=dog;if(mixer){mixer.stopAllAction();mixer.uncacheRoot(old);}if(old)scene.remove(old);
  coatMaterials.length=0;bones={};feet=[];dog=g.scene;activePose=pose;requestedPose=null;document.body.dataset.pose=pose;
  if(pose!=='walking'){
