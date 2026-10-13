@@ -37,8 +37,9 @@ html{scroll-padding-top:32px}.hero{height:120svh;min-height:800px}.hero-copy{top
 .hero-story{color:#fff8e9!important;max-width:34ch}
 
 
-/* scroll safety */
-html,body{overflow-x:hidden;overflow-y:auto}
+/* Horizontal clip only — overflow-x:hidden on html/body breaks position:sticky
+   (world/signal scenes collapse to green/cream void while scrolling). */
+html,body{overflow-x:clip}
 
 
 /* Story hero after cinema: one full frame, no cream void */
