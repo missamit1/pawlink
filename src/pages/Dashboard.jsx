@@ -26,7 +26,7 @@ import {
 import './Dashboard.css'
 
 const TRAIL_MAX = 24
-const DOCK_WIDTH = 1360
+const APPROVED_DOCK_WIDTH = 1360
 
 function metersBetween(a, b) {
   const toRad = (d) => (d * Math.PI) / 180
@@ -39,13 +39,17 @@ function metersBetween(a, b) {
   return 2 * R * Math.asin(Math.sqrt(x))
 }
 
+/**
+ * Composition-space Events presentation (desktop hero only).
+ * Compact when the hero cannot host the approved Dock beside the side UI.
+ */
 function measureEventsPresentation(viewportWidth) {
   if (viewportWidth <= 900) return 'rail'
   const leftReserve = Math.min(320, viewportWidth * 0.18) + 36
   const eventsReserve = Math.min(248, viewportWidth * 0.22) + 22
   const freeHeroWidth =
     viewportWidth - leftReserve - eventsReserve - 56
-  return freeHeroWidth < DOCK_WIDTH ? 'compact' : 'rail'
+  return freeHeroWidth < APPROVED_DOCK_WIDTH ? 'compact' : 'rail'
 }
 
 function getAlertLabel(anomalyType, dogName) {
@@ -85,7 +89,7 @@ function Dashboard() {
   const [alerts, setAlerts] = useState([])
   const [latest, setLatest] = useState(null)
   const [liveAlert, setLiveAlert] = useState(null)
-  
+  /** Bumps on alerts realtime INSERT — History TODAY refetch only (no second channel). */
   const [todayAlertSignal, setTodayAlertSignal] = useState(0)
   const [trail, setTrail] = useState([])
   const [homeZone, setHomeZone] = useState({
@@ -93,9 +97,9 @@ function Dashboard() {
     centerLng: SAFE_ZONE_CENTER_LNG,
     radius: SAFE_ZONE_RADIUS,
   })
-  
+  /** Bumps only when we intentionally re-fetch zone from DB (not optimistic SET). */
   const [homeZoneEpoch, setHomeZoneEpoch] = useState(0)
-  
+  /** Prevents a slow DB load from overwriting a fresher SET / USE MY LOCATION. */
   const homeZoneGenRef = useRef(0)
   const [locationStatus, setLocationStatus] = useState('')
   const [hologramActive, setHologramActive] = useState(false)
@@ -106,7 +110,7 @@ function Dashboard() {
       : 'rail',
   )
 
-  
+  // Instant apply after Safe Zone SET (don't wait only on DB round-trip).
   useEffect(() => {
     const zone = routeLocation.state?.refreshedSafeZone
     if (!zone) return
@@ -192,7 +196,7 @@ function Dashboard() {
     return () => window.removeEventListener('resize', onResize)
   }, [])
 
-  
+  // Dog-scoped loads + realtime. Re-subscribe when selectedDog changes.
   useEffect(() => {
     if (!dogId) return undefined
 
@@ -257,7 +261,7 @@ function Dashboard() {
         .limit(1)
 
       if (cancelled) return
-      
+      // A newer SET / USE MY LOCATION won — don't overwrite it with stale fetch.
       if (genAtStart !== homeZoneGenRef.current) return
       if (error) {
         console.log('SAFE ZONE LOAD ERROR:', error.message)
@@ -327,8 +331,10 @@ function Dashboard() {
     }
   }, [dogId, homeZoneEpoch])
 
-  
-
+  /**
+   * USE MY LOCATION — GPS only. Does not write safe_zone.
+   * The circle is saved later on SET in the big map.
+   */
   function useMyLocationAsHome() {
     if (!navigator.geolocation) {
       setLocationStatus('Geolocation is not supported in this browser.')
@@ -400,7 +406,7 @@ function Dashboard() {
     >
       <div className="product-screen__twin" id="ray">
         <DigitalTwin
-          src="/digital-twin/twin.html?embed=1&v=120"
+          src="/digital-twin/twin.html?embed=1&v=121"
           archiveMode={historyOpen}
           selectedDog={selectedDog}
           apiRef={twinApiRef}

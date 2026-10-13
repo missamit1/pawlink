@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react'
 import './DigitalTwin.css'
 
+/**
+ * Temporary isolation shell: embeds the Codex Twin runtime in a same-origin iframe.
+ * Host owns latest / alerts / Supabase — this wrapper does not fetch or subscribe.
+ * selectedDog / selectedDog.modelUrl prepared for a later breed/model phase —
+ * current Dalmatian Twin GLB stays locked (no visual switch in P1).
+ */
 export default function DigitalTwin({
   telemetry = null,
   archiveMode = false,
@@ -19,7 +25,8 @@ export default function DigitalTwin({
 
   function pushTelemetry() {
     const api = getApi()
-    if (!api) return
+    // Never push null/empty — that cleared activity_state and froze the walk cycle.
+    if (!api || !telemetry) return
     api.updateTelemetry(telemetry)
   }
 
@@ -50,6 +57,7 @@ export default function DigitalTwin({
 
   useEffect(() => {
     pushArchiveMode()
+    // Cue may mount after ready — brief retry while Archive is open.
     if (!archiveMode) return undefined
     const id = window.setInterval(() => pushArchiveMode(), 400)
     const stop = window.setTimeout(() => window.clearInterval(id), 2500)

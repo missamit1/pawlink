@@ -18,17 +18,19 @@ import {GLTFLoader} from './vendor/loaders/GLTFLoader.js';
 import {OrbitControls} from './vendor/controls/OrbitControls.js';
 import {RoomEnvironment} from './vendor/environments/RoomEnvironment.js';
 import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=11';
+// Embed is set on body after this module loads — read the URL now so gait never freezes on Dashboard.
+const isDashboardEmbed=new URLSearchParams(location.search).has('embed')||window.self!==window.top;
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;document.body.prepend(renderer.domElement);
 const scene=new T.Scene();scene.fog=new T.Fog(0x252923,5,12);const camera=new T.PerspectiveCamera(36,innerWidth/innerHeight,.01,30);camera.position.set(1.35,.70,2.0);
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.38,0);controls.enabled=false;controls.enableDamping=false;controls.enableRotate=false;controls.enableZoom=false;controls.enablePan=false;controls.minDistance=2.05;controls.maxDistance=2.8;controls.minPolarAngle=1.20;controls.maxPolarAngle=1.40;controls.minAzimuthAngle=-.8;controls.maxAzimuthAngle=1.5;controls.rotateSpeed=.3;controls.zoomSpeed=.35;
 const pm=new T.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),.04).texture;
-
+// Warm architectural key with a soft, neutral fill; the coat stays recognizably white.
 scene.add(new T.HemisphereLight(0xfff1e0,0x75604c,.78));
 const light=new T.DirectionalLight(0xffdfbd,2.05);light.position.set(-2,3,2);light.castShadow=true;
 light.shadow.mapSize.set(1024,1024);Object.assign(light.shadow.camera,{left:-1.1,right:1.1,top:1.3,bottom:-.9,near:.1,far:8});light.shadow.bias=-.00035;light.shadow.normalBias=.028;light.shadow.radius=3;scene.add(light);
 const fill=new T.DirectionalLight(0xf1e7e3,.65);fill.position.set(2,1,2);scene.add(fill);
 const rim=new T.DirectionalLight(0xffd6b1,.55);rim.position.set(-1,1.4,-2);scene.add(rim);
-
+// Soft thoracic glow — only when heart anatomy is revealed (does not alter outer coat)
 const chestGlow=new T.PointLight(0xff9a8a,0,.95,2);chestGlow.position.set(-.02,.45,.08);scene.add(chestGlow);
 let telemetry={heart_rate:null,hydration:null,steps:null,activity:null,activity_state:null,temperature:null,latitude:null,longitude:null,created_at:null};let pulsePhase=0,modeChanged=0;const clock=new T.Clock(),uniforms={bloomPass:{value:0},noiseAmount:{value:.045},noiseScale:{value:12},edgeSoftness:{value:.065},flowAmount:{value:.018},flowSpeed:{value:.10},fresnelIntensity:{value:.52},bloomStrength:{value:.24},heartLight:{value:1.15},amount:{value:0},time:{value:0},focus:{value:0},scan:{value:0},bodyAmount:{value:0},heartReveal:{value:0},water:{value:0},thermal:{value:0},activity:{value:0},hydration:{value:.82},temperature:{value:.56},pulse:{value:0},motion:{value:matchMedia('(prefers-reduced-motion: reduce)').matches?0:1}};const coatMaterials=[];let gaitWeight=()=>{};let dog,mixer,bones={},paused=false,hologram=false,mode='overview',elapsed=0,stepCount=0;
 uniforms.body=bodyMaskSignals();uniforms.completeTwin={value:0};uniforms.scanSignals=createScanSignals();
@@ -36,7 +38,9 @@ if(SIGNATURE_SCAN){document.body.dataset.scanPath='signature-peel';console.info(
 else{document.body.dataset.scanPath='normal';}
 const fluid=fluidReveal(renderer,uniforms);
 const glowMat=(color,opacity=1)=>new T.MeshBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:T.AdditiveBlending});
-
+// A softly lit architectural studio, independent of the PawLink application.
+// Contact plane: just under paw pads. Follows measured support so feet read planted
+// without changing locked Ray bake position (Dashboard composition).
 const CONTACT_Y=-.018;
 const SHADOW_UNDER=.0032;
 const ground=new T.Mesh(new T.PlaneGeometry(1.5,1.4),new T.ShadowMaterial({color:0x503829,opacity:.15}));ground.rotation.x=-Math.PI/2;ground.position.y=CONTACT_Y-SHADOW_UNDER;ground.receiveShadow=true;ground.material.depthWrite=false;scene.add(ground);
@@ -52,9 +56,9 @@ const stone=new T.MeshStandardMaterial({color:0x30372f,roughness:.85});
 for(const x of [-3,-1.9,1.6,3]){const column=new T.Mesh(new T.BoxGeometry(.24,4,.34),stone);column.position.set(x,1.7,-2);column.visible=false;scene.add(column)}
 const wall=new T.Mesh(new T.PlaneGeometry(18,8),stone);wall.position.set(0,2,-4);wall.visible=false;scene.add(wall);
 const dust=new T.Group();scene.add(dust);
-
+// Both anatomy objects below are loaded from the user's supplied GLB files.
 const ribFrame={value:new T.Matrix4()};const heart=new T.Group(),ribs=new T.Group();heart.name='PawLinkHeart';ribs.name='PawLinkRibs';heart.visible=ribs.visible=false;scene.add(heart,ribs);let heartMesh=null;
-
+// Optical depth behind the anatomy; a contained thoracic volume, not a second dog.
 const interior=new T.Mesh(new T.SphereGeometry(1,32,24),new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{reveal:uniforms.heartReveal},vertexShader:`varying vec3 n;varying vec3 v;void main(){vec4 p=modelViewMatrix*vec4(position,1.);n=normalize(normalMatrix*normal);v=-p.xyz;gl_Position=projectionMatrix*p;}`,fragmentShader:`varying vec3 n;varying vec3 v;uniform float reveal;void main(){float thickness=pow(abs(dot(normalize(n),normalize(v))),.7);gl_FragColor=vec4(vec3(.12,.24,.23),thickness*.19*reveal);}` }));interior.scale.set(.087,.112,.128);interior.renderOrder=0;scene.add(interior);
 Object.assign(interior.material.uniforms,{uBodyOrigin:uniforms.body.origin,uBodyProgress:uniforms.body.progress,uBodyWorldToRest:uniforms.body.worldToRest});
 interior.material.vertexShader=interior.material.vertexShader.replace('varying vec3 n;','varying vec3 w;varying vec3 n;').replace('gl_Position=','w=(modelMatrix*vec4(position,1.)).xyz;gl_Position=');
@@ -69,7 +73,7 @@ function fitAsset(g,target,dimensions){
 new GLTFLoader().load('./heart.glb',g=>{
  fitAsset(g.scene,heart,[.077,.10,.062]);heart.rotation.set(.05,.25,-.15);
  g.scene.traverse(o=>{if(o.isMesh){heartMesh=o;o.material=holographicHeart(uniforms);if(!SIGNATURE_SCAN)maskAnatomy(o.material,uniforms.body,.045);o.renderOrder=SIGNATURE_SCAN?5:1;
- 
+ // Derived preview morph; original GLB remains untouched.
  const pos=o.geometry.attributes.position,bb=new T.Box3().setFromBufferAttribute(pos),c=bb.getCenter(new T.Vector3()),span=bb.max.y-bb.min.y,arr=new Float32Array(pos.array.length);
  for(let i=0;i<pos.count;i++){const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i),w=1-T.MathUtils.smoothstep((y-bb.min.y)/span,.45,1);const twist=.024*w,dx=x-c.x,dz=z-c.z;arr[i*3]=c.x+(dx*Math.cos(twist)-dz*Math.sin(twist))*(1-.06*w);arr[i*3+1]=y+span*.035*w;arr[i*3+2]=c.z+(dx*Math.sin(twist)+dz*Math.cos(twist))*(1-.045*w);}
  o.geometry.morphAttributes.position=[new T.BufferAttribute(arr,3)];o.updateMorphTargets();o.morphTargetDictionary={systole:0};
@@ -103,7 +107,7 @@ new GLTFLoader().load('./ribs.glb',g=>{
  };o.material.customProgramCacheKey=()=>`ribs-holo-78-${SIGNATURE_SCAN?1:0}`;
  if(!SIGNATURE_SCAN)maskAnatomy(o.material,uniforms.body,.018);
  }});anatomyReady++;ready();},undefined,anatomyError);
-
+// One continuous optical drop with a shaped liquid volume and a moving meniscus.
 const drop=new T.Group();scene.add(drop);
 const profile=new T.CubicBezierCurve(new T.Vector2(0,0),new T.Vector2(.070,.003),new T.Vector2(.025,.062),new T.Vector2(0,.115));
 const pts=profile.getPoints(96);
@@ -120,6 +124,8 @@ let activePose='walking',requestedPose=null,poseRequest=0;let heartBone,heartOff
 const modelFiles={walking:'./dog.glb',sleeping:'./sleeping.glb',resting:'./resting.glb'};
 function disposeDog(object){if(!object)return;object.traverse(o=>{if(o.isMesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){for(const value of Object.values(m))if(value?.isTexture)value.dispose();m.dispose();}}});}
 async function switchPose(state){
+ // Missing state must not kill a live gait (empty host push used to set timeScale=0).
+ if(!state){if(mixer&&telemetry.activity_state)mixer.timeScale=1;return;}
  const pose=state==='running'?'walking':state;fluid.reset();
  const note=document.querySelector('#pose-status');
  if(!modelFiles[pose]){if(!dog&&requestedPose)return;poseRequest++;requestedPose=null;if(mixer)mixer.timeScale=0;note.textContent='State unavailable · last pose retained';return;}
@@ -136,15 +142,15 @@ async function switchPose(state){
   const scale=.83/Math.max(size.x,size.z);dog.scale.multiplyScalar(scale);dog.position.set(-c.x*scale,-.018-box.min.y*scale,-c.z*scale);
  }
  scene.add(dog);
-
+// Cache possible contact vertices once, then evaluate the actual animated positions.
 supportSamples=[];dog.traverse(o=>{if(!o.isMesh||o.userData.innerEnvelope)return;const pos=o.geometry.attributes.position;o.geometry.computeBoundingBox();const box=o.geometry.boundingBox;const limit=activePose==='walking'?.18:box.min.y+(box.max.y-box.min.y)*.38;const indices=[];for(let i=0;i<pos.count;i++)if(pos.getY(i)<=limit)indices.push(i);supportSamples.push({mesh:o,indices});});
 dog.traverse(o=>{if(o.isBone)bones[o.name]=o;if(o.isMesh){o.castShadow=true;o.receiveShadow=false;o.frustumCulled=false;const materials=Array.isArray(o.material)?o.material:[o.material];materials.forEach(mat=>{coatMaterials.push(mat);mat.transparent=true;mat.depthWrite=true;o.renderOrder=SIGNATURE_SCAN?2:3;coatOptics(mat,uniforms,pose!=='walking');mat.needsUpdate=true;});}});
 
  addInnerEnvelope(dog,uniforms.body,uniforms.completeTwin);
  collarBone=Object.values(bones).find(b=>b.name.includes('Head_0'))||dog;collarOffset=collarBone.worldToLocal(new T.Vector3(0,.605,.255));
- heartBone=bones['Spine_1']||Object.values(bones).find(b=>b.name.includes('Spine_1'))||dog;dog.updateMatrixWorld(true);heartOffset=heartBone.worldToLocal(pose==='walking'?heartPos.clone():new T.Vector3(-.12,.20,.035));heart.scale.setScalar(1);heart.rotation.set(.05,pose==='walking'?.25:-.35,pose==='walking'?-.15:-.65);ribOffset=heartBone.worldToLocal(pose==='walking'?new T.Vector3(0,.465,.075):new T.Vector3(-.08,.22,.05));
+ heartBone=bones['tripoSpine_1']||Object.values(bones).find(b=>b.name.includes('Spine_1'))||dog;dog.updateMatrixWorld(true);heartOffset=heartBone.worldToLocal(pose==='walking'?heartPos.clone():new T.Vector3(-.12,.20,.035));heart.scale.setScalar(1);heart.rotation.set(.05,pose==='walking'?.25:-.35,pose==='walking'?-.15:-.65);ribOffset=heartBone.worldToLocal(pose==='walking'?new T.Vector3(0,.465,.075):new T.Vector3(-.08,.22,.05));
  heartBone.getWorldQuaternion(chestRotation);heartRotation.copy(chestRotation).invert().multiply(heart.quaternion);ribRotation.copy(chestRotation).invert().multiply(ribs.quaternion);
- const names=['0_Left_Limb_4','bone_24','1_Left_Limb_2','0_Right_Limb_2'];feet=pose==='walking'?names.map(n=>bones[n]||Object.values(bones).find(b=>b.name.replaceAll(':','')===n)):[];
+ const names=['tripo0_Left_Limb_4','bone_24','tripo1_Left_Limb_2','tripo0_Right_Limb_2'];feet=pose==='walking'?names.map(n=>bones[n]||Object.values(bones).find(b=>b.name.replaceAll(':','')===n)):[];
  const clip=g.animations.length?(pose==='walking'?smoothWalkingClip(g.animations[0]):g.animations[0]):null;
  gaitWeight=clip&&pose==='walking'?walkingWeight(dog,clip,feet):()=>{};
  mixer=new T.AnimationMixer(dog);if(clip)mixer.clipAction(clip).play();mixer.timeScale=telemetry.activity_state?1:0;
@@ -178,14 +184,14 @@ function setAppearance(value){
   button.setAttribute('aria-pressed',String(hologram));
  }
  if(!hologram)select('overview');
- 
+ // Product host (Dashboard Location) shows Return to Ray while hologram is open.
  if(window.parent&&window.parent!==window){
   try{
    window.parent.postMessage(
     {type:'pawlink:hologram',active:hologram},
     window.location.origin,
    );
-  }catch{}
+  }catch{/* cross-origin ignore */}
  }
 }
 export function setTwinHologram(value){setAppearance(!!value);}
@@ -216,7 +222,7 @@ function project(el,pos){
 }
 let contextZoom=1;
 const stageAnchor=new T.Vector3(0,-.018,.06);
-
+/* Default framing — MacBook 16 lock uses exact HUD bake only on that viewport. */
 let HERO_SCALE=.85;
 const PAW_DOCK_AIR=30;
 const DOCK_BOTTOM_PX=20;
@@ -237,8 +243,8 @@ function computeDefaultFrameX(){
 function ensureCompositionLock(){
  if(!dog||innerWidth<=700)return;
  if(rayCal?.fromEditor)return;
- 
- 
+ // Dashboard: MacBook lock by default; clearly ultrawide → existing ULTRAWIDE bake.
+ // Never unlock to default centered framing on desktop embed.
  const preset=
   document.body?.dataset?.embed==='dashboard'
    ? pickDashboardPreset(innerWidth,innerHeight)
@@ -290,12 +296,12 @@ renderer.setAnimationLoop(()=>{const realDt=clock.getDelta(),dt=Math.min(realDt,
  const bpmForPulse=liveBpm??(heartLikely?74:null);
  const heartbeat=advancePulse(pulsePhase,realDt,bpmForPulse);pulsePhase=heartbeat.phase;heartUI.update(realDt);if(requestedSystem&&interaction.locked&&p===1){heartUI.select(requestedSystem);requestedSystem=null;}
  updateScanPlane(uniforms.scanSignals,p,dog,heart);
- 
+ // Signature: unlock radial body-mask so the plane alone reveals anatomy.
  if(SIGNATURE_SCAN&&p>0)uniforms.body.progress.value=1;
  uniforms.completeTwin.value=T.MathUtils.damp(uniforms.completeTwin.value,interaction.locked&&p===1?1:0,reduced?1000:4.5,realDt);
  const frame=SIGNATURE_SCAN
   ?{coat:p>0?1:0,scan:p,heart:p>.02?1:0,ribs:p>.02?1:0,labels:0,collar:0}
-  
+  // Sleep/rest: hologram coat first, then ribs, heart last (same end look as walking).
   : activePose!=='walking'
     ?{coat:p>0?1:0,scan:p,heart:T.MathUtils.smoothstep(p,.48,.82),ribs:T.MathUtils.smoothstep(p,.22,.52),labels:0,collar:0}
     :{coat:p>0?1:0,scan:p,heart:T.MathUtils.smoothstep(p,.08,.35),ribs:T.MathUtils.smoothstep(p,.04,.20),labels:0,collar:0};
@@ -310,7 +316,9 @@ renderer.setAnimationLoop(()=>{const realDt=clock.getDelta(),dt=Math.min(realDt,
  labelAmount=frame.labels;document.body.style.setProperty('--telemetry-reveal',labelAmount);document.body.dataset.twinState=reveal.state;document.body.style.setProperty('--anatomy-reveal',frame.heart);
  document.querySelector('.tabs').inert=false;
  if(!SIGNATURE_SCAN){const translucent=uniforms.amount.value>0;for(const mat of coatMaterials){if(mat.transparent!==translucent){mat.transparent=translucent;mat.depthWrite=true;mat.needsUpdate=true;}}}
- if(mixer&&!paused&&!reduced&&telemetry.activity_state&&!stale){mixer.update(dt);gaitWeight(mixer.time,activePose==='walking');}controls.update();alignStage();dust.rotation.y=elapsed*.015;
+ // Dashboard: keep product gait alive (reduce-motion / brief stale must not freeze Ray for employers).
+ const gaitLive=!!telemetry.activity_state&&(isDashboardEmbed||(!stale&&!reduced&&!paused));
+ if(mixer&&gaitLive){if(mixer.timeScale===0)mixer.timeScale=1;mixer.update(dt);gaitWeight(mixer.time,activePose==='walking');}controls.update();alignStage();dust.rotation.y=elapsed*.015;
 if(dog){dog.updateMatrixWorld(true);
 {
  const measureSupport=()=>{
@@ -322,27 +330,27 @@ if(dog){dog.updateMatrixWorld(true);
  let lowest=Infinity;const minima=[Infinity,Infinity,Infinity,Infinity];
  for(const {mesh,indices} of supportSamples){const pos=mesh.geometry.attributes.position;for(const i of indices){mesh.getVertexPosition(i,groundPoint);groundPoint.applyMatrix4(mesh.matrixWorld);lowest=Math.min(lowest,groundPoint.y);if(activePose==='walking'){const pi=(pos.getZ(i)>0?0:2)+(pos.getX(i)<0?1:0);if(groundPoint.y<minima[pi]){minima[pi]=groundPoint.y;pawSurface[pi].copy(groundPoint);}}}}
  if(rayCal?.active){
-  
+  // Keep bake pose; seat the ground under measured pads so feet don't float.
   dog.userData.supportY=Number.isFinite(lowest)?lowest:dog.position.y;
   syncContactPlane(dog.userData.supportY);
   return;
  }
  if(Number.isFinite(lowest)){const shift=CONTACT_Y-lowest;dog.position.y+=shift;if(activePose==='walking')for(const p of pawSurface)p.y+=shift;dog.updateMatrixWorld(true);dog.userData.supportY=lowest+shift;syncContactPlane(dog.userData.supportY);}
  };measureSupport();
- 
- 
+ // Walking is authored in place: never pin a sole in world space.
+ // Preserve the clip's stance-to-swing velocity; only the body support height is corrected.
 }
 
 interaction.updateAnatomyFrame(heartBone);
 heart.position.copy(heartBone.localToWorld(heartOffset.clone()));heartBone.getWorldQuaternion(chestRotation);heart.quaternion.copy(chestRotation).multiply(heartRotation);ribs.quaternion.copy(chestRotation).multiply(ribRotation);const beat=pulsePhase;const pulse=(!reduced&&bpmForPulse!=null?1:0)*(Math.exp(-Math.pow((beat-.12)/.075,2))*.17+Math.exp(-Math.pow((beat-.32)/.08,2))*.09);uniforms.pulse.value=pulse;heart.visible=frame.heart>.001;
 if(activePose!=='walking'&&frame.heart>.001){
- 
+ // Same organ scale as walking; mild inset so it reads inside the chest, not a sticker.
  heart.scale.setScalar(1);
  heart.position.add(new T.Vector3(0,.006,-.016).applyQuaternion(chestRotation));
 }
 ribs.scale.setScalar(1);
 if(heartMesh){heartMesh.morphTargetInfluences[0]=pulse*(SIGNATURE_SCAN?2.2:4.4);heartMesh.material.emissiveIntensity=(SIGNATURE_SCAN?(.18+uniforms.scanSignals.discover.value*.55):.32)+pulse*.85+uniforms.focus.value*.12+(hoveredBody==='heart'?hoverFlash*.16:0);}ribs.position.copy(heartBone.localToWorld(ribOffset.clone()));interior.position.copy(ribs.position);interior.quaternion.copy(chestRotation);interior.visible=!SIGNATURE_SCAN&&frame.heart>.001;ribFrame.value.makeRotationFromQuaternion(chestRotation).setPosition(ribs.position).invert();ribs.visible=frame.ribs>.001;ribs.traverse(o=>{if(o.isMesh){if(SIGNATURE_SCAN)o.material.opacity=1;else o.material.opacity=(.10+.28*T.MathUtils.smoothstep(p,.22,.5)-.06*uniforms.focus.value-.025*Math.max(uniforms.water.value,uniforms.thermal.value)+.03*uniforms.activity.value)*frame.ribs;}});
-
+// Chest glow tracks heart — soft living light, not a neon lamp
 chestGlow.position.copy(heart.position);chestGlow.intensity=T.MathUtils.damp(chestGlow.intensity,(SIGNATURE_SCAN?0:(frame.heart*(.35+pulse*1.4+uniforms.focus.value*.45))),4,realDt);
 drop.position.set(activePose==='walking'?.42:.30,(activePose==='walking'?.36:.16)+Math.sin(elapsed*1.3)*.004,.05);drop.rotation.set(.035*Math.sin(elapsed),elapsed*.08,.045*Math.sin(elapsed*.7));drop.scale.setScalar(mode==='water'?1.45:1.1);drop.visible=false;
 pawSurface.forEach((fp,i)=>{
@@ -351,7 +359,7 @@ pawSurface.forEach((fp,i)=>{
  const shadeY=(lift<.004?fp.y:contact)-SHADOW_UNDER;
 
  pawShadows[i].visible=activePose==='walking';
- 
+ // Discs sit just under pads — planted on the stage, not through the toes.
  pawShadows[i].position.set(fp.x,shadeY,fp.z);
  pawShadows[i].material.opacity=.55*(1.0-T.MathUtils.smoothstep(lift,.004,.065))+.08*(1.0-T.MathUtils.smoothstep(lift,.02,.15));
  pawShadows[i].scale.setScalar(.62+lift*2.1);
@@ -362,11 +370,12 @@ if(mixer&&!paused&&telemetry.activity_state&&!stale){pawSurface.forEach((p,i)=>{
  if(collarBone){collarSignal.position.copy(collarBone.localToWorld(collarOffset.clone()));collarBone.getWorldQuaternion(collarRotation);collarSignal.quaternion.copy(collarRotation);}
  collarSignal.visible=frame.collar>.001&&!reduced;collarSignal.material.opacity=frame.collar*.5;
 
+
  project(document.querySelector('#heartMark'),heart.position);project(document.querySelector('#waterMark'),ribs.position);project(document.querySelector('#feetMark'),activePose==='walking'?(pawSurface[0].y<pawSurface[1].y?pawSurface[0]:pawSurface[1]):stageAnchor);project(document.querySelector('#temperatureMark'),ribs.position);}
 
 for(let i=footprints.length-1;i>=0;i--){const f=footprints[i],age=elapsed-f.born;f.group.scale.setScalar(1+Math.min(age/.48,1)*.18);f.mat.opacity=Math.pow(Math.max(0,1-age/.48),1.5)*.24*uniforms.amount.value*uniforms.activity.value;if(age>.48){scene.remove(f.group);f.group.traverse(o=>o.geometry?.dispose());f.mat.dispose();footprints.splice(i,1)}}const fluidOn=uniforms.fluidActive.value;uniforms.fluidActive.value=0;renderer.shadowMap.needsUpdate=true;reflection.update(dog,heart,ribs);uniforms.fluidActive.value=fluidOn;finishing.render();});
 
-if(matchMedia('(prefers-reduced-motion: reduce)').matches){paused=true;document.querySelector('#pause span').textContent='Resume motion';}
+if(!isDashboardEmbed&&matchMedia('(prefers-reduced-motion: reduce)').matches){paused=true;const pauseLabel=document.querySelector('#pause span');if(pauseLabel)pauseLabel.textContent='Resume motion';}
 
 function paintReading(element,key){
  if(key==='overview'){element.textContent='';return;}
@@ -448,7 +457,7 @@ window.__pawlinkRayCal={
  rebase(){if(!rayCal)return null;const snap=snapshotRayCal();rayCal.baseline={...snap};return {...rayCal};},
  current(){if(!rayCal?.codeDefaults)return null;applyRayCal({...rayCal.codeDefaults});return {...rayCal};},
  disable(){rayCal=null;ensureCompositionLock();alignStage();},
- 
+ /** Exact live framing targets currently driving viewOffset (not inferred from paws). */
  liveFraming(){
   const heroScale=Number.isFinite(window.__pawlinkHeroScale)?window.__pawlinkHeroScale:HERO_SCALE;
   return{
@@ -479,12 +488,14 @@ window.__pawlinkRayCal={
 };
 window.twinDemo={scene,camera,controls,select,setAppearance,updateTelemetry,state:()=>({experience:interaction.state(),state:reveal.state,channels:{...reveal.value},phase:pulsePhase,motionTime:mixer?.time??0,mode,systems:{water:uniforms.water.value,thermal:uniforms.thermal.value,activity:uniforms.activity.value,hydration:uniforms.hydration.value,temperature:uniforms.temperature.value},fluid:uniforms.fluidActive.value,pose:activePose,focus:uniforms.focus.value,pulse:uniforms.pulse.value,contacts:footprints.length,bloom:finishing.supported,heartVisible:heart.visible,ribsVisible:ribs.visible,render:renderer.info.render}),grounding:()=>({supportY:dog?.userData.supportY,paws:pawSurface.map(p=>p.toArray()),shadows:pawShadows.map(p=>({position:p.position.toArray(),opacity:p.material.opacity})),bones:feet.map(b=>b?.name),root:dog?.position.toArray()})};
 
+// Host integration: dispatch a validated reading through the existing adapter.
 window.addEventListener('pawlink:telemetry',event=>{if(event.detail?.reading)updateTelemetry(event.detail.reading,event.detail.options||{});});
 
 updateTelemetry({}, {source:'external',connection:'unknown'});
 window.updateTelemetry=updateTelemetry;
 window.rayProof={complete:()=>uniforms.completeTwin.value,state:interaction.state,progress:interaction.captureProgress,release:interaction.release,origin:()=>uniforms.body.origin.value.toArray()};
 
+// Isolated review entry opens the approved complete Twin, then selects Heart.
 if(new URLSearchParams(location.search).get('twin')==='1'){
  const openReview=()=>{if(!dogReady||anatomyReady!==2){requestAnimationFrame(openReview);return;}renderer.domElement.dispatchEvent(new KeyboardEvent('keydown',{code:'Enter'}));};openReview();
 }

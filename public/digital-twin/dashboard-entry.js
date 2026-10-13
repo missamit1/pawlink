@@ -1,16 +1,16 @@
-import {updateTelemetry,exploreSystem,setTwinHologram} from './twin-scene.js?v=119';
+import {updateTelemetry,exploreSystem,setTwinHologram} from './twin-scene.js?v=121';
 const systems={heart:'heart',hydration:'water',movement:'steps',temperature:'thermal',overview:'overview'};
 if(new URLSearchParams(location.search).has('embed')||window.self!==window.top){
  document.body.dataset.embed='dashboard';
 }
-
+// Presentation adapter only: no subscriptions, storage, fetching or application store.
 window.pawlinkDigitalTwin=Object.freeze({
  updateTelemetry(snapshot){updateTelemetry(snapshot??{}, {source:'external',connection:'unknown'});},
  selectSystem(system){if(systems[system])exploreSystem(systems[system]);},
  returnToRay(){document.querySelector('#return-ray')?.click();},
  setHologram(active){setTwinHologram(!!active);},
  isHologram(){return document.body.dataset.twinState==='revealing'||document.body.dataset.twinState==='hologram';},
- 
+ /** Archive mode: hide Take control chrome visually; Twin scene stays mounted. */
  setArchiveMode(open){
   if(open) document.body.dataset.archive='open';
   else delete document.body.dataset.archive;
@@ -38,6 +38,7 @@ window.pawlinkDigitalTwin=Object.freeze({
 });
 window.dispatchEvent(new Event('pawlink:digital-twin-ready'));
 
+// If cue is created after ready (body-interaction), re-apply pending archive.
 const archiveObserver=new MutationObserver(()=>{
  if(document.body.dataset.archive!=='open') return;
  const cue=document.querySelector('#proof-cue');
@@ -49,6 +50,7 @@ const archiveObserver=new MutationObserver(()=>{
 });
 archiveObserver.observe(document.body,{childList:true,subtree:true});
 
+// DEV-only direct composition editor — Dashboard adds ?calibrate=1 only under Vite DEV.
 if(new URLSearchParams(location.search).get('calibrate')==='1'){
  import('./ray-placement-calibrate.js?v=11').then((m)=>m.mountRayPlacementCalibrate()).catch((err)=>{
   console.warn('[PawLink DEV] composition editor failed to mount', err);
