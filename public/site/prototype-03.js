@@ -18,7 +18,8 @@ function playSignalChime(){if(!sound||!signalAudio||signalAudio.state!=="running
 
 const movementCues=[{time:1.25,heart:82,activity:'Walking',temp:'38.3'},{time:2.2,heart:87,activity:'Walking',temp:'38.3'},{time:3.1,heart:94,activity:'Active',temp:'38.3'},{time:4.25,heart:98,activity:'Running',temp:'38.4'},{time:5.4,heart:101,activity:'Running',temp:'38.4'},{time:6.55,heart:103,activity:'Running',temp:'38.4'}];
 let movementCue=-1;
-function prepareMovement(){runDecks.forEach(v=>{v.preload='auto';v.load()});
+function armVideo(v){if(!v)return;const src=v.dataset.src;if(src&&v.getAttribute('src')!==src){v.src=src;}}
+function prepareMovement(){runDecks.forEach(v=>{armVideo(v);v.preload='auto';v.load()});
  for(const [v,t] of [[sideRun,.05],[collarReturn,6.7]]){if(v.readyState>=1)v.currentTime=t;else v.addEventListener('loadedmetadata',()=>{v.currentTime=t},{once:true});}zoneFieldPromise??=createBoundaryDirector($('#boundaryFX'),movement,stage).then(field=>zoneField=field);}
 function startMovement(){editShot='run';returnStarted=false;stage.dataset.edit='run';shadowFinale.style.opacity=0;$('.movement-edition').textContent='RAY / IN MOTION';$('#signalInsight').textContent='';sideRun.style.opacity=0;collarReturn.style.opacity=0;movement=firstRun;continuation.style.opacity=0;runTime=0;movement.playbackRate=1;movement.preservesPitch=true;setPhase('outdoor');movement.volume=0;playVideo(movement);$('#sceneName').textContent='';}
 let sample=-1,stepSample=-1,focusSignal='';
@@ -74,7 +75,7 @@ function setPhase(next){phase=next;stage.dataset.phase=next;elapsed=0;
 function syncPlay(){playButton.textContent=paused?'Continue':'Pause';playButton.setAttribute('aria-label',paused?'Continue experience':'Pause experience');}
 async function playVideo(v){zoneField?.resume();gateTimeline?.resume();if(v.ended)return;active=v;if(overlap&&runDecks.includes(v)&&!paused&&visible)runDecks.find(other=>other!==v).play().catch(()=>{});v.muted=!sound;if(paused||!visible)return;try{await v.play();syncPlay()}catch(error){if(v!==active||error.name==='AbortError')return;paused=true;syncPlay();invitation.textContent='Press Continue to play with sound.'}}
 function wake(){if(!raf&&visible&&!document.hidden)raf=requestAnimationFrame(tick)}
-function begin(){if(phase!=='idle')return;setPhase('campaign');paused=false;ray.preload='auto';ray.load();playVideo(campaign);wake()}
+function begin(){if(phase!=='idle')return;setPhase('campaign');paused=false;armVideo(campaign);campaign.preload='auto';campaign.load();armVideo(ray);ray.preload='auto';ray.load();playVideo(campaign);wake()}
 function prepareHandoff(){if(phase!=='campaign')return;setPhase('handoff');campaign.pause();ray.currentTime=0;ray.pause();handoffReady=ray.readyState>=2;$('#sceneName').textContent='THEIR WORLD → HIS WORLD';invitation.textContent='';}
 ray.addEventListener('loadeddata',()=>{handoffReady=true;wake()});
 campaign.addEventListener('ended',prepareHandoff);
@@ -83,7 +84,7 @@ ray.addEventListener('ended',()=>{
   
   scene.style.height=Math.max(innerHeight*2.2,scrollY-scene.offsetTop+innerHeight*2.2)+'px';
   enterButton.hidden=false;invitation.textContent=reduced?'Enter through the light.':'Scroll into the light.';
-  $('#sceneName').textContent='';pov.preload='auto';pov.load();wake();
+  $('#sceneName').textContent='';armVideo(pov);pov.preload='auto';pov.load();wake();
 });
 pov.addEventListener('play',()=>{if(movement.preload==='none')prepareMovement()});
 pov.addEventListener('ended',()=>{if(phase==='pov')startMovement();});

@@ -31,9 +31,22 @@ const SPA_ROUTES = [
   '/safe-zone',
 ]
 
-function sendFile(res, filePath) {
-  res.setHeader('Content-Type', contentType(filePath))
-  fs.createReadStream(filePath).pipe(res)
+function sendFile(req, res, filePath) {
+  // Express sendFile supports Accept-Ranges — required for video seeking/streaming.
+  // createReadStream().pipe() forced full-file downloads and made the opening feel stuck.
+  res.sendFile(filePath, {
+    acceptRanges: true,
+    cacheControl: true,
+    maxAge: process.env.NODE_ENV === 'production' ? 3_600_000 : 0,
+    lastModified: true,
+    etag: true,
+    headers: {
+      'Content-Type': contentType(filePath),
+    },
+  }, (err) => {
+    if (!err || res.headersSent) return
+    res.status(err.status || err.statusCode || 500).end()
+  })
 }
 
 function isSpaRoute(urlPath) {
@@ -57,17 +70,13 @@ app.use((req, res, next) => {
 
   if (urlPath.startsWith('/api')) return next()
   if (isSpaRoute(urlPath)) {
-    return sendFile(res, spaIndex)
+    return sendFile(req, res, spaIndex)
   }
   if (isAppPath(urlPath)) return next()
 
   const siteFile = resolveSiteFile(siteRoot, urlPath)
   if (siteFile) {
-    if (req.method === 'HEAD') {
-      res.setHeader('Content-Type', contentType(siteFile))
-      return res.end()
-    }
-    return sendFile(res, siteFile)
+    return sendFile(req, res, siteFile)
   }
 
   return next()
@@ -91,7 +100,7 @@ app.use((req, res, next) => {
   if (urlPath.includes('.')) {
     return res.status(404).send('Not found')
   }
-  return sendFile(res, spaIndex)
+  return sendFile(req, res, spaIndex)
 })
 
 app.listen(PORT, () => {
