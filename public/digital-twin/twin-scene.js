@@ -17,7 +17,7 @@ import {isolatedBloom} from './isolated-bloom.js?v=24';
 import {GLTFLoader} from './vendor/loaders/GLTFLoader.js';
 import {OrbitControls} from './vendor/controls/OrbitControls.js';
 import {RoomEnvironment} from './vendor/environments/RoomEnvironment.js';
-import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=12';
+import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=13';
 // Embed is set on body after this module loads — read the URL now so gait never freezes on Dashboard.
 const isDashboardEmbed=new URLSearchParams(location.search).has('embed')||window.self!==window.top;
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;document.body.prepend(renderer.domElement);

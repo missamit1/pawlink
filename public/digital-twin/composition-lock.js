@@ -199,7 +199,6 @@ export function macbook16Snapshot() {
 
 export function applyPresetBackground(preset, body = document.body) {
   const b = preset.background;
-  const isDashboard = body?.dataset?.embed === 'dashboard';
   const fitScale =
     b.fit === 'contain'
       ? Math.min(innerWidth / PLATE_W, innerHeight / PLATE_H)
@@ -208,13 +207,9 @@ export function applyPresetBackground(preset, body = document.body) {
   body.style.setProperty('background-color', '#c9c1b5', 'important');
   body.style.setProperty('background-image', `url('./${b.asset}')`, 'important');
   body.style.setProperty('background-repeat', 'no-repeat', 'important');
-  // iframe + fixed letterboxes; Dashboard uses scroll but KEEPS bake pixel size
-  // (CSS `cover` uses intrinsic JPG size and drifts Ray off the marble stage).
-  body.style.setProperty(
-    'background-attachment',
-    isDashboard ? 'scroll' : 'fixed',
-    'important',
-  );
+  // MACBOOK_16 bake was approved with attachment:fixed + plate pixel size.
+  // Do not switch to scroll/cover — that drifts Ray off the marble stage.
+  body.style.setProperty('background-attachment', 'fixed', 'important');
   body.style.setProperty(
     'background-size',
     `${PLATE_W * s}px ${PLATE_H * s}px`,

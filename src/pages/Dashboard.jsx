@@ -406,7 +406,7 @@ function Dashboard() {
     >
       <div className="product-screen__twin" id="ray">
         <DigitalTwin
-          src="/digital-twin/twin.html?embed=1&v=123"
+          src="/digital-twin/twin.html?embed=1&v=124"
           archiveMode={historyOpen}
           selectedDog={selectedDog}
           apiRef={twinApiRef}
