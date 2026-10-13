@@ -180,6 +180,7 @@ dog.traverse(o=>{if(o.isBone)bones[o.name]=o;if(o.isMesh){o.castShadow=true;o.re
  if(innerWidth>760){camera.position.set(1.35,.70,2.0);controls.target.set(0,.27,0);}else{camera.position.set(1.35,.70,2.0);controls.target.set(0,.27,0);}
  note.textContent=telemetry.activity_state==='running'?'Running data · walking animation fallback':pose==='walking'?'Walking animation':'Breathing animation · chest heart view';
  disposeDog(old);dogReady=true;ready();
+ alignStage();
  }catch(e){if(token!==poseRequest)return;requestedPose=null;note.textContent='Model unavailable — choose a state to retry';const l=document.querySelector('#loading');if(l)l.textContent='Unable to load model. Please reload.';console.error(e);}
 }
 switchPose(telemetry.activity_state||'walking');
@@ -264,10 +265,11 @@ function computeDefaultFrameX(){
 function ensureCompositionLock(){
  if(!dog||innerWidth<=700)return;
  if(rayCal?.fromEditor)return;
- // Dashboard: MacBook lock by default; clearly ultrawide → existing ULTRAWIDE bake.
- // Never unlock to default centered framing on desktop embed.
+ // Dashboard embed MUST use pickDashboardPreset (URL), not body.dataset —
+ // dataset is set after this module loads; matchPreset drifts Ray off the marble.
+ if(isDashboardEmbed) document.body.dataset.embed='dashboard';
  const preset=
-  document.body?.dataset?.embed==='dashboard'
+  isDashboardEmbed
    ? pickDashboardPreset(innerWidth,innerHeight)
    : matchPreset(innerWidth,innerHeight);
  if(!preset){
@@ -277,13 +279,17 @@ function ensureCompositionLock(){
  }
  const snap=snapshotFromPreset(preset,{w:innerWidth,h:innerHeight});
  HERO_SCALE=snap.heroScale;
- if(!rayCal||rayCal.fromLock){
+ if(!rayCal||rayCal.fromLock||rayCal.lockId!==preset.id){
   rayCal={active:true,...snap,baseline:{...snap},codeDefaults:{...snap},fromLock:true,lockId:preset.id};
+ }else if(rayCal.fromLock){
+  // Keep bake ids; refresh scaled frame for live iframe size.
+  rayCal.frameX=snap.frameX;rayCal.frameY=snap.frameY;rayCal.heroScale=snap.heroScale;
+  rayCal.x=snap.x;rayCal.y=snap.y;rayCal.z=snap.z;rayCal.scale=snap.scale;
  }
  dog.position.set(rayCal.x,rayCal.y,rayCal.z);
  dog.scale.setScalar(rayCal.scale);
  dog.updateMatrixWorld(true);
- // Re-apply on every lock/resize so plate size tracks the live iframe.
+ // Plate size must track iframe — bake pixel size + fixed (approved MacBook lock).
  applyPresetBackground(preset,document.body);
  lockedBgId=preset.id;
 }
