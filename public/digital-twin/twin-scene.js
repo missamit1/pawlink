@@ -17,7 +17,7 @@ import {isolatedBloom} from './isolated-bloom.js?v=24';
 import {GLTFLoader} from './vendor/loaders/GLTFLoader.js';
 import {OrbitControls} from './vendor/controls/OrbitControls.js';
 import {RoomEnvironment} from './vendor/environments/RoomEnvironment.js';
-import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=11';
+import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=12';
 // Embed is set on body after this module loads — read the URL now so gait never freezes on Dashboard.
 const isDashboardEmbed=new URLSearchParams(location.search).has('embed')||window.self!==window.top;
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;document.body.prepend(renderer.domElement);
@@ -174,7 +174,7 @@ dog.traverse(o=>{if(o.isBone)bones[o.name]=o;if(o.isMesh){o.castShadow=true;o.re
  const names=['tripo0_Left_Limb_4','bone_24','tripo1_Left_Limb_2','tripo0_Right_Limb_2'];feet=pose==='walking'?names.map(n=>bones[n]||Object.values(bones).find(b=>b.name.replaceAll(':','')===n)):[];
  const clip=g.animations.length?(pose==='walking'?smoothWalkingClip(g.animations[0]):g.animations[0]):null;
  gaitWeight=clip&&pose==='walking'?walkingWeight(dog,clip,feet):()=>{};
- mixer=new T.AnimationMixer(dog);if(clip)mixer.clipAction(clip).play();mixer.timeScale=telemetry.activity_state?1:0;
+ mixer=new T.AnimationMixer(dog);if(clip)mixer.clipAction(clip).play();mixer.timeScale=(isDashboardEmbed||telemetry.activity_state)?1:0;
  footLights.forEach(o=>o.visible=pose==='walking');pawShadows.forEach(o=>o.visible=pose==='walking');for(const f of footprints){scene.remove(f.group);f.group.traverse(o=>o.geometry?.dispose());f.mat.dispose();}footprints.length=0;
  shadow.scale.set(pose==='walking'?1:1.08,pose==='walking'?1:.8,1);shadow.material.opacity=.68;shadow.position.z=pose==='walking'?0:.08;
  if(innerWidth>760){camera.position.set(1.35,.70,2.0);controls.target.set(0,.27,0);}else{camera.position.set(1.35,.70,2.0);controls.target.set(0,.27,0);}
@@ -337,8 +337,10 @@ renderer.setAnimationLoop(()=>{const realDt=clock.getDelta(),dt=Math.min(realDt,
  labelAmount=frame.labels;document.body.style.setProperty('--telemetry-reveal',labelAmount);document.body.dataset.twinState=reveal.state;document.body.style.setProperty('--anatomy-reveal',frame.heart);
  document.querySelector('.tabs').inert=false;
  if(!SIGNATURE_SCAN){const translucent=uniforms.amount.value>0;for(const mat of coatMaterials){if(mat.transparent!==translucent){mat.transparent=translucent;mat.depthWrite=true;mat.needsUpdate=true;}}}
- // Dashboard: keep product gait alive (reduce-motion / brief stale must not freeze Ray for employers).
- const gaitLive=!!telemetry.activity_state&&(isDashboardEmbed||(!stale&&!reduced&&!paused));
+ // Dashboard: walk whenever the walking model is on stage (host metrics alone must not freeze Ray).
+ const gaitLive=isDashboardEmbed
+  ?(activePose==='walking'||!!telemetry.activity_state)
+  :(!!telemetry.activity_state&&!stale&&!reduced&&!paused);
  if(mixer&&gaitLive){if(mixer.timeScale===0)mixer.timeScale=1;mixer.update(dt);gaitWeight(mixer.time,activePose==='walking');}controls.update();alignStage();dust.rotation.y=elapsed*.015;
 if(dog){dog.updateMatrixWorld(true);
 {

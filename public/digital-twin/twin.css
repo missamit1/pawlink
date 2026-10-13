@@ -1,7 +1,7 @@
-
+/* Approved PawLink stage plate (16:10, deep floor reserve). ONE background. */
 body{background:#c9c1b5 url('./stage-laptop.jpg') center center/cover no-repeat fixed!important}
-/* iframe + fixed letterboxes; dashboard embed fills edge-to-edge. */
-body[data-embed=dashboard]{background-attachment:scroll!important;background-size:cover!important}
+/* iframe + fixed letterboxes — attachment only; size comes from composition-lock bake. */
+body[data-embed=dashboard]{background-attachment:scroll!important}
 body:before{display:none!important}
 .campaign-brand{position:fixed;left:8.7%;top:6.6%;z-index:3;color:#6a2835;font:500 18px 'DM Sans',sans-serif;letter-spacing:7px;pointer-events:none}
 .campaign-brand small{display:block;font:10px/1.85 'DM Sans',sans-serif;letter-spacing:3px;margin-top:16px;color:#644a43}
@@ -21,9 +21,9 @@ body:before{display:none!important}
 #heart-relationship path{stroke:#f6eee0;stroke-width:.7}#heart-relationship circle{fill:#6a2835}
 @media(max-width:1000px){.campaign-copy{left:9%;top:25%}.campaign-copy h1{font-size:49px}.campaign-brand{left:7%}.campaign-motto{font-size:8px}.spatial-heart-proof #system-navigation{right:3%;width:155px}}
 @media(max-width:700px){body{background-size:auto calc(100vh - 100px)!important;background-position:57% top!important}.campaign-brand{left:20px;top:24px;font-size:14px;letter-spacing:4px}.campaign-brand small{font-size:7px;margin-top:8px}.campaign-copy{left:20px;top:21%}.campaign-copy h1{font-size:36px;letter-spacing:-1.2px}.campaign-copy p{font-size:7px;letter-spacing:1.5px;margin-top:14px}.campaign-motto{display:none}.campaign-foot,.campaign-signoff{font-size:7px;letter-spacing:1px;bottom:3%}.spatial-heart-proof #system-navigation{top:15%;right:15px;width:145px}#system-navigation .system-label{font-size:10px}#heart-annotation .annotation-reading{font-size:42px}}
-
+/* Neutral desktop baseline: cover + center (no experimental crop offsets). */
 @media(min-width:701px){body{background-size:cover!important;background-position:center center!important}}
-
+/* Final supplied composition: burgundy editorial ink on the architectural plate. */
 .campaign-brand{left:8.5%;top:3.5%;font-size:18px}.campaign-brand small{margin-top:13px}
 .campaign-copy{left:8.5%;top:19%}.campaign-copy h1{font-size:clamp(44px,5.1vw,82px);line-height:.94}.campaign-copy p{margin-left:44px;margin-top:28px;color:#392a24}
 .campaign-motto,.campaign-signoff{display:none}.campaign-foot{font-size:9px;max-width:180px}
