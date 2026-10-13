@@ -7,28 +7,19 @@ hint.className='canvas-flow-hint';
 hint.setAttribute('role','status');
 document.body.append(hint);
 
-const continueBtn=document.createElement('a');
-continueBtn.href='/story';
-continueBtn.className='canvas-flow-continue';
-continueBtn.textContent='Continue the story ↓';
-continueBtn.hidden=true;
-document.body.append(continueBtn);
-
 let active=false,ready=false,leaving=false,elapsed=0,last=performance.now(),touchY=null,boundDoc=null;
+const GATE_MS=8000;
 
 function visible(){
   return stage.dataset.edit==='complete'&&frame.hasAttribute('src');
 }
 
 function advance(e){
-  if(!active||leaving)return;
-  // Fail-open: after the gate is shown, allow exit even if the iframe never binds.
-  if(!ready&&elapsed<2500)return;
+  if(!active||!ready||leaving)return;
   e?.preventDefault();
   e?.stopImmediatePropagation();
   leaving=true;
   hint.textContent='A little closer…';
-  continueBtn.hidden=true;
   document.body.classList.add('canvas-flow-leaving');
   setTimeout(
     ()=>location.assign('/story'),
@@ -53,14 +44,12 @@ function bind(){
 }
 
 frame.addEventListener('load',bind);
-frame.addEventListener('error',()=>{ready=true;});
 bind();
 
 addEventListener('wheel',e=>{if(e.deltaY>8)advance(e);},{passive:false,capture:true});
 addEventListener('keydown',e=>{
   if(!document.querySelector('dialog[open]')&&['ArrowDown','PageDown',' '].includes(e.key))advance(e);
 },true);
-continueBtn.addEventListener('click',e=>{e.preventDefault();advance(e);});
 
 setInterval(()=>{
   const now=performance.now();
@@ -70,18 +59,17 @@ setInterval(()=>{
     ready=false;
     elapsed=0;
     hint.hidden=true;
-    continueBtn.hidden=true;
   }else{
     if(!active){active=true;elapsed=0;bind();}
     else if(!document.hidden)elapsed+=Math.min(now-last,250);
-    // Ready after ~2.5s, or sooner once the iframe document is reachable.
-    ready=elapsed>=2500||!!boundDoc&&elapsed>=800;
+    // Original product law: explore ~8s, then scroll continues the story.
+    // Still become ready after the gate even if iframe bind failed (no stuck cream screen).
+    ready=elapsed>=GATE_MS;
     hint.hidden=false;
-    continueBtn.hidden=false;
     if(!leaving){
       hint.textContent=ready
         ?'SCROLL TO CONTINUE ↓'
-        :'MOVE TO EXPLORE · '+Math.max(1,Math.ceil((2500-elapsed)/1000))+'s';
+        :'MOVE TO EXPLORE · '+Math.max(1,Math.ceil((GATE_MS-elapsed)/1000))+'s';
     }
   }
   last=now;
