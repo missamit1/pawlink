@@ -19,14 +19,16 @@ function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// let = קופסה שאפשר לשנות בהמשך (לא קבוע כמו const)
-let activityState = 'running'
+// Demo Day: start INSIDE the safe zone (walking), not already beyond the circle.
+let activityState = 'walking'
 
 // מתי התחיל המצב הנוכחי (מספר מילישניות מ־1970)
 let stateStartedAt = Date.now()
 
-// הצגה: מספיק זמן לצאת מהעיגול ולחזור ברגל
+// הצגה: זמן בפנים, יציאה קצרה להתראה, וחזרה
 const MIN_STATE_MS = 25 * 1000
+const WALKING_HOLD_MS = 45 * 1000
+const RUNNING_HOLD_MS = 18 * 1000
 
 const injectAnomaly = false
 
@@ -43,8 +45,14 @@ let runDirLng = -1
 
 function maybeChangeState() {
   const elapsed = Date.now() - stateStartedAt
+  const holdMs =
+    activityState === 'walking'
+      ? WALKING_HOLD_MS
+      : activityState === 'running'
+        ? RUNNING_HOLD_MS
+        : MIN_STATE_MS
 
-  if (elapsed < MIN_STATE_MS) {
+  if (elapsed < holdMs) {
     return
   }
 
@@ -90,11 +98,11 @@ const stateRanges = {
   }
 }
 
-// הערכים החיים — מתחילים מריצה, ואז זזים לאט
-let currentHeartRate = 120
-let currentActivity = 200
-let currentTemperature = 385
-let currentHydration = 70
+// הערכים החיים — מתחילים בהליכה בתוך האזור
+let currentHeartRate = 95
+let currentActivity = 110
+let currentTemperature = 383
+let currentHydration = 72
 
 // בית דמו — מתחיל בתל אביב, ואז מתעדכן מ־safe_zone שנשמר ב־SET
 // יחידות × 10000 כדי להשתמש ב־takeSmallStep
@@ -102,6 +110,7 @@ let currentHydration = 70
 let HOME_LAT = 320853
 let HOME_LNG = 347818
 let HOME_RADIUS_UNITS = 26
+// תמיד מתחילים במרכז הבית — לא מחוץ לעיגול
 let currentLatitude = HOME_LAT
 let currentLongitude = HOME_LNG
 
@@ -182,8 +191,8 @@ function updateLocationForState() {
     return
   }
 
-  // רץ: יוצא מעבר לגבול
-  const outside = radius * 1.55
+  // רץ: יציאה קלה מעבר לגבול (התראה) — לא בריחה רחוקה שנראית כמו באג בהצגה
+  const outside = radius * 1.12
   currentLatitude = stepToward(
     currentLatitude,
     HOME_LAT + runDirLat * outside,
