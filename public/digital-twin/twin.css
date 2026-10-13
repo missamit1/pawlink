@@ -1,5 +1,7 @@
 
 body{background:#c9c1b5 url('./stage-laptop.jpg') center center/cover no-repeat fixed!important}
+/* iframe + fixed letterboxes; dashboard embed fills edge-to-edge. */
+body[data-embed=dashboard]{background-attachment:scroll!important;background-size:cover!important}
 body:before{display:none!important}
 .campaign-brand{position:fixed;left:8.7%;top:6.6%;z-index:3;color:#6a2835;font:500 18px 'DM Sans',sans-serif;letter-spacing:7px;pointer-events:none}
 .campaign-brand small{display:block;font:10px/1.85 'DM Sans',sans-serif;letter-spacing:3px;margin-top:16px;color:#644a43}

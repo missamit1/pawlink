@@ -17,7 +17,7 @@ import {isolatedBloom} from './isolated-bloom.js?v=24';
 import {GLTFLoader} from './vendor/loaders/GLTFLoader.js';
 import {OrbitControls} from './vendor/controls/OrbitControls.js';
 import {RoomEnvironment} from './vendor/environments/RoomEnvironment.js';
-import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=10';
+import {MACBOOK_16,ULTRAWIDE,pickDashboardPreset,matchPreset,snapshotFromPreset,applyPresetBackground} from './composition-lock.js?v=11';
 const renderer=new T.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;document.body.prepend(renderer.domElement);
 const scene=new T.Scene();scene.fog=new T.Fog(0x252923,5,12);const camera=new T.PerspectiveCamera(36,innerWidth/innerHeight,.01,30);camera.position.set(1.35,.70,2.0);
 const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,.38,0);controls.enabled=false;controls.enableDamping=false;controls.enableRotate=false;controls.enableZoom=false;controls.enablePan=false;controls.minDistance=2.05;controls.maxDistance=2.8;controls.minPolarAngle=1.20;controls.maxPolarAngle=1.40;controls.minAzimuthAngle=-.8;controls.maxAzimuthAngle=1.5;controls.rotateSpeed=.3;controls.zoomSpeed=.35;
@@ -256,7 +256,9 @@ function ensureCompositionLock(){
  dog.position.set(rayCal.x,rayCal.y,rayCal.z);
  dog.scale.setScalar(rayCal.scale);
  dog.updateMatrixWorld(true);
- if(lockedBgId!==preset.id){applyPresetBackground(preset,document.body);lockedBgId=preset.id;}
+ // Re-apply on every lock/resize so plate size tracks the live iframe.
+ applyPresetBackground(preset,document.body);
+ lockedBgId=preset.id;
 }
 function alignStage(){
  const mobile=innerWidth<=700;

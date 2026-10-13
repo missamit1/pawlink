@@ -174,15 +174,28 @@ export function macbook16Snapshot() {
 
 export function applyPresetBackground(preset, body = document.body) {
   const b = preset.background;
+  const isDashboard = body?.dataset?.embed === 'dashboard';
   const fitScale =
     b.fit === 'contain'
       ? Math.min(innerWidth / PLATE_W, innerHeight / PLATE_H)
       : Math.max(innerWidth / PLATE_W, innerHeight / PLATE_H);
   const s = fitScale * b.scale;
+  body.style.setProperty('background-color', '#c9c1b5', 'important');
   body.style.setProperty('background-image', `url('./${b.asset}')`, 'important');
   body.style.setProperty('background-repeat', 'no-repeat', 'important');
-  body.style.setProperty('background-attachment', 'fixed', 'important');
-  body.style.setProperty('background-size', `${PLATE_W * s}px ${PLATE_H * s}px`, 'important');
+  // iframe + fixed letterboxes the plate; dashboard embed must scroll + cover.
+  body.style.setProperty(
+    'background-attachment',
+    isDashboard ? 'scroll' : 'fixed',
+    'important',
+  );
+  body.style.setProperty(
+    'background-size',
+    isDashboard && b.fit === 'cover' && b.scale === 1
+      ? 'cover'
+      : `${PLATE_W * s}px ${PLATE_H * s}px`,
+    'important',
+  );
   body.style.setProperty('background-position', `${50 + b.x}% ${50 + b.y}%`, 'important');
 }
 
