@@ -324,8 +324,38 @@ function Dashboard() {
       )
       .subscribe()
 
+    // Live map must move even if Realtime INSERT is delayed/off — poll with the collar.
+    const pollLive = window.setInterval(async () => {
+      if (cancelled) return
+      const { data } = await supabase
+        .from('telemetry')
+        .select(
+          'heart_rate, activity, temperature, activity_state, hydration, latitude, longitude, created_at, dog_id',
+        )
+        .eq('dog_id', dogId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+      const row = data?.[0]
+      if (!row || cancelled) return
+      setLatest((prev) =>
+        prev?.created_at === row.created_at ? prev : row,
+      )
+      setTrail((current) => {
+        const last = current[current.length - 1]
+        if (
+          last &&
+          last.lat === row.latitude &&
+          last.lng === row.longitude
+        ) {
+          return current
+        }
+        return pushTrailPoint(current, row)
+      })
+    }, 4000)
+
     return () => {
       cancelled = true
+      window.clearInterval(pollLive)
       supabase.removeChannel(alertsChannel)
       supabase.removeChannel(telemetryChannel)
     }
