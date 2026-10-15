@@ -19,49 +19,50 @@ function randomBetween(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-// Demo Day: start INSIDE the safe zone (walking), not already beyond the circle.
+// Demo Day: full pose loop — walk → run (brief exit) → rest → sleep → walk…
 let activityState = 'walking'
 
-// מתי התחיל המצב הנוכחי (מספר מילישניות מ־1970)
 let stateStartedAt = Date.now()
 
-// הצגה: זמן בפנים, יציאה קצרה להתראה, וחזרה
-const MIN_STATE_MS = 25 * 1000
-const WALKING_HOLD_MS = 45 * 1000
-const RUNNING_HOLD_MS = 18 * 1000
+// Hold times per state (ms) — long enough to see on Twin + map
+const HOLD_MS = {
+  walking: 40 * 1000,
+  running: 20 * 1000,
+  resting: 28 * 1000,
+  sleeping: 28 * 1000,
+}
 
 const injectAnomaly = false
 
-// לולאת הצגה: בפנים → רץ החוצה → הולך הביתה → נח → שוב
+// Must visit every pose — old graph was stuck on walking ↔ running only.
 const allowedNext = {
-  sleeping: ['resting'],
-  resting: ['walking'],
   walking: ['running'],
-  running: ['walking'],
+  running: ['resting'],
+  resting: ['sleeping'],
+  sleeping: ['walking'],
 }
 
 let runDirLat = 1
 let runDirLng = -1
+let walkDirLat = 1
+let walkDirLng = 1
 
 function maybeChangeState() {
   const elapsed = Date.now() - stateStartedAt
-  const holdMs =
-    activityState === 'walking'
-      ? WALKING_HOLD_MS
-      : activityState === 'running'
-        ? RUNNING_HOLD_MS
-        : MIN_STATE_MS
+  const holdMs = HOLD_MS[activityState] ?? 25 * 1000
 
   if (elapsed < holdMs) {
     return
   }
 
   const options = allowedNext[activityState]
-  const nextState = options[randomBetween(0, options.length - 1)]
+  const nextState = options[0]
 
-  if (nextState === 'running') {
+  if (nextState === 'running' || nextState === 'walking') {
     runDirLat = randomBetween(0, 1) === 0 ? -1 : 1
     runDirLng = randomBetween(0, 1) === 0 ? -1 : 1
+    walkDirLat = runDirLat
+    walkDirLng = runDirLng
   }
 
   activityState = nextState
@@ -168,40 +169,38 @@ function stepToward(current, target, stepSize) {
 function updateLocationForState() {
   const radius = Math.max(HOME_RADIUS_UNITS, 12)
 
-  // ישן / נח: הולך הביתה לאט — בלי קפיצה
+  // Sleep / rest: settle near home center (map pin calm)
   if (activityState === 'sleeping' || activityState === 'resting') {
-    currentLatitude = stepToward(currentLatitude, HOME_LAT, 4)
-    currentLongitude = stepToward(currentLongitude, HOME_LNG, 4)
+    currentLatitude = stepToward(currentLatitude, HOME_LAT, 5)
+    currentLongitude = stepToward(currentLongitude, HOME_LNG, 5)
     return
   }
 
-  // הולך: חוזר לפנים העיגול
+  // Walking: patrol inside the circle so the live map trail clearly moves
   if (activityState === 'walking') {
-    const inside = radius * 0.45
-    currentLatitude = stepToward(
-      currentLatitude,
-      HOME_LAT + runDirLat * inside,
-      4
-    )
-    currentLongitude = stepToward(
-      currentLongitude,
-      HOME_LNG + runDirLng * inside,
-      4
-    )
+    const inside = radius * 0.5
+    const targetLat = HOME_LAT + walkDirLat * inside
+    const targetLng = HOME_LNG + walkDirLng * inside
+    if (Math.hypot(currentLatitude - targetLat, currentLongitude - targetLng) < 3) {
+      walkDirLat *= -1
+      if (randomBetween(0, 1) === 0) walkDirLng *= -1
+    }
+    currentLatitude = stepToward(currentLatitude, targetLat, 8)
+    currentLongitude = stepToward(currentLongitude, targetLng, 8)
     return
   }
 
-  // רץ: יציאה קלה מעבר לגבול (התראה) — לא בריחה רחוקה שנראית כמו באג בהצגה
+  // Running: brief step just past the boundary (safe-zone alert), then cycle continues
   const outside = radius * 1.12
   currentLatitude = stepToward(
     currentLatitude,
     HOME_LAT + runDirLat * outside,
-    6
+    10,
   )
   currentLongitude = stepToward(
     currentLongitude,
     HOME_LNG + runDirLng * outside,
-    6
+    10,
   )
 }
 

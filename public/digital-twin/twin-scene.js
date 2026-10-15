@@ -181,7 +181,13 @@ dog.traverse(o=>{if(o.isBone)bones[o.name]=o;if(o.isMesh){o.castShadow=true;o.re
  note.textContent=telemetry.activity_state==='running'?'Running data · walking animation fallback':pose==='walking'?'Walking animation':'Breathing animation · chest heart view';
  disposeDog(old);dogReady=true;ready();
  alignStage();
- }catch(e){if(token!==poseRequest)return;requestedPose=null;note.textContent='Model unavailable — choose a state to retry';const l=document.querySelector('#loading');if(l)l.textContent='Unable to load model. Please reload.';console.error(e);}
+ }catch(e){
+  if(token!==poseRequest)return;
+  requestedPose=null;
+  // Keep last good pose on stage — never blank the demo if one GLB fails.
+  note.textContent='Pose unavailable · keeping last pose';
+  console.error('[PawLink] switchPose failed',pose,e);
+ }
 }
 switchPose(telemetry.activity_state||'walking');
 const info={overview:['Ray, a living portrait','','Select a system to explore.'],heart:['The rhythm within','','Beneath the familiar, a rhythm all his own. Select a system to explore the connection.'],steps:['Made to wander','','Four paws. One unmistakable rhythm. Contact lights follow this illustrative walk cycle.'],thermal:['Warmth, understood','','A single temperature reading, shown in context. This is not a spatial thermal scan.'],water:['A little replenishment','','A fluid portrait of hydration. An illustrative value for the product concept, not a measurement.']};

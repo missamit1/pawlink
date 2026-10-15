@@ -1,4 +1,4 @@
-import {updateTelemetry,exploreSystem,setTwinHologram} from './twin-scene.js?v=125';
+import {updateTelemetry,exploreSystem,setTwinHologram} from './twin-scene.js?v=126';
 const systems={heart:'heart',hydration:'water',movement:'steps',temperature:'thermal',overview:'overview'};
 if(new URLSearchParams(location.search).has('embed')||window.self!==window.top){
  document.body.dataset.embed='dashboard';
