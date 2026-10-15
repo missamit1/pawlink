@@ -122,6 +122,10 @@ const footLights=Array.from({length:4},()=>{const o=new T.Mesh(new T.TorusGeomet
 const footprints=[];function footprint(pos){const group=new T.Group(),mat=glowMat(0xdaf2e9,.18);const ring=new T.Mesh(new T.RingGeometry(.022,.02265,64),mat);ring.rotation.x=-Math.PI/2;group.add(ring);group.position.copy(pos);group.position.y=-.016;scene.add(group);footprints.push({group,mat,born:elapsed});}
 let activePose='walking',requestedPose=null,poseRequest=0;let heartBone,heartOffset,ribOffset,heartRotation=new T.Quaternion(),ribRotation=new T.Quaternion(),feet=[];const chestRotation=new T.Quaternion();const heartPos=new T.Vector3(-.030,.443,.052),footPos=new T.Vector3(),lastPhases=[0,0,0,0];
 const modelFiles={walking:'./dog.glb',sleeping:'./sleeping.glb',resting:'./resting.glb'};
+// Warm the resting/sleeping GLBs so Demo Day pose swaps do not stall on first load.
+;['sleeping','resting'].forEach((pose)=>{
+ new GLTFLoader().load(modelFiles[pose],()=>{},undefined,()=>{});
+});
 function disposeDog(object){if(!object)return;object.traverse(o=>{if(o.isMesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material]){for(const value of Object.values(m))if(value?.isTexture)value.dispose();m.dispose();}}});}
 /** Three PropertyBinding treats `:` as reserved — `tripo::Spine_0` tracks never bind, so Ray freezes. */
 function sanitizeGltfAnimationNames(root,animations=[]){

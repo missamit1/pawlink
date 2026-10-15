@@ -1,5 +1,7 @@
-
-
+/**
+ * Location Field — MapLibre Safe Zone + Location Instrument.
+ * PLACE→EXPAND→SET lives in prototypes/safe-zone-membrane (LOCKED).
+ */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArrowRight, NavigationArrow } from '@phosphor-icons/react'
 import { Map, MercatorCoordinate, setWorkerUrl } from 'maplibre-gl'
@@ -48,6 +50,7 @@ function circlePath(home, radiusM, segments = 96) {
   return path
 }
 
+/** Keep HOME, Ray, and safe-zone radius inside the circular lens. */
 function fitLensToWorld(map, { home, ray, radiusM }) {
   if (!map || !home || !Number.isFinite(home.lat) || !Number.isFinite(home.lng)) {
     return
@@ -81,6 +84,7 @@ function fitLensToWorld(map, { home, ray, radiusM }) {
   )
 }
 
+/** Native MapLibre ring — visible even if deck.gl overlay fails. */
 function syncNativeZone(map, home, radiusM) {
   if (!map?.getSource || !home) return
   const ring = circlePath(home, Math.max(1, radiusM))
@@ -200,7 +204,7 @@ function toneBasemap(map) {
         map.setPaintProperty(id, 'text-halo-width', 1)
       }
     } catch {
-      
+      /* locked tone */
     }
   }
 }
@@ -289,7 +293,7 @@ export default function LocationField({
     return () => window.removeEventListener('keydown', onKey)
   }, [inspectOpen])
 
-  
+  // Keep live props in ref for render loop
   useEffect(() => {
     const s = stateRef.current
     s.home = { lat: centerLat, lng: centerLng }
@@ -421,7 +425,7 @@ export default function LocationField({
           }
         }
 
-        
+        // Keep native ring in sync with live home / radius.
         if (now - (s._lastNativeSync || 0) > 400) {
           s._lastNativeSync = now
           syncNativeZone(map, s.home, s.radiusM)
@@ -483,6 +487,9 @@ export default function LocationField({
               capRounded: true,
               jointRounded: true,
               billboard: false,
+              updateTriggers: {
+                getPath: [trailPath.length, pos[0], pos[1]],
+              },
             }),
           )
         }
@@ -546,7 +553,7 @@ export default function LocationField({
 
         overlay.setProps({ layers })
 
-        
+        // Keep Ray + safe boundary inside the lens (not home-only zoom).
         const mapCenter = map.getCenter()
         const rayFromCenter = haversineMeters(
           { lat: mapCenter.lat, lng: mapCenter.lng },
@@ -583,11 +590,11 @@ export default function LocationField({
       mapRef.current = null
       overlayRef.current = null
     }
-    
-    
+    // mount once — live data via stateRef
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  
+  // When home / radius / Ray move, reframe so boundary + Ray stay in the lens.
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
@@ -601,7 +608,7 @@ export default function LocationField({
     })
   }, [centerLat, centerLng, radiusMeters, latitude, longitude])
 
-  
+  // Fit Location Instrument between nav bottom and Dock top.
   useEffect(() => {
     const host = hostRef.current
     if (!host) return undefined
@@ -633,7 +640,7 @@ export default function LocationField({
         screen.style.setProperty('--location-dock-gap', `${gap}px`)
       }
 
-      
+      // Derive lower track from actual lens bottom so HOME stays clear.
       const instrument = host.querySelector('.location-instrument')
       const lens = host.querySelector('.ray-location__lens-system')
       const radar = host.querySelector('.home-radar')
@@ -654,7 +661,7 @@ export default function LocationField({
             `${lensTopPct.toFixed(2)}%`,
           )
 
-          
+          // Keep HOME fully below the lens outer rim.
           if (radar) {
             const radarHalfPct =
               ((radar.getBoundingClientRect().height / 2) / hostBox.height) *
@@ -709,7 +716,7 @@ export default function LocationField({
       <section className="location-editorial-stage" aria-label="PawLink chrome">
         {children}
 
-        {}
+        {/* Stage plate — right of nav (red-arrow target), not over the map lens */}
         <div className="ray-location__editorial-block">
           <div className="ray-location__editorial">
             <h1>

@@ -24,12 +24,12 @@ let activityState = 'walking'
 
 let stateStartedAt = Date.now()
 
-// Hold times per state (ms) — long enough to see on Twin + map
+// Hold times — short enough that employers see all 4 poses within ~1 minute
 const HOLD_MS = {
-  walking: 40 * 1000,
-  running: 20 * 1000,
-  resting: 28 * 1000,
-  sleeping: 28 * 1000,
+  walking: 18 * 1000,
+  running: 12 * 1000,
+  resting: 16 * 1000,
+  sleeping: 16 * 1000,
 }
 
 const injectAnomaly = false
@@ -67,6 +67,20 @@ function maybeChangeState() {
 
   activityState = nextState
   stateStartedAt = Date.now()
+
+  // Snap toward the new state's GPS target so the map pin moves immediately
+  const radius = Math.max(HOME_RADIUS_UNITS, 12)
+  if (activityState === 'walking') {
+    currentLatitude = HOME_LAT + walkDirLat * Math.round(radius * 0.35)
+    currentLongitude = HOME_LNG + walkDirLng * Math.round(radius * 0.35)
+  } else if (activityState === 'running') {
+    currentLatitude = HOME_LAT + runDirLat * Math.round(radius * 1.12)
+    currentLongitude = HOME_LNG + runDirLng * Math.round(radius * 1.12)
+  } else {
+    currentLatitude = HOME_LAT
+    currentLongitude = HOME_LNG
+  }
+
   console.log('🔄 State changed to:', activityState)
 }
 
@@ -176,31 +190,31 @@ function updateLocationForState() {
     return
   }
 
-  // Walking: patrol inside the circle so the live map trail clearly moves
+  // Walking: patrol inside so trail + pin clearly move on the live map
   if (activityState === 'walking') {
-    const inside = radius * 0.5
+    const inside = radius * 0.55
     const targetLat = HOME_LAT + walkDirLat * inside
     const targetLng = HOME_LNG + walkDirLng * inside
-    if (Math.hypot(currentLatitude - targetLat, currentLongitude - targetLng) < 3) {
+    if (Math.hypot(currentLatitude - targetLat, currentLongitude - targetLng) < 4) {
       walkDirLat *= -1
-      if (randomBetween(0, 1) === 0) walkDirLng *= -1
+      walkDirLng *= randomBetween(0, 1) === 0 ? -1 : 1
     }
-    currentLatitude = stepToward(currentLatitude, targetLat, 8)
-    currentLongitude = stepToward(currentLongitude, targetLng, 8)
+    currentLatitude = stepToward(currentLatitude, targetLat, 12)
+    currentLongitude = stepToward(currentLongitude, targetLng, 12)
     return
   }
 
-  // Running: brief step just past the boundary (safe-zone alert), then cycle continues
+  // Running: just past the boundary (safe-zone alert)
   const outside = radius * 1.12
   currentLatitude = stepToward(
     currentLatitude,
     HOME_LAT + runDirLat * outside,
-    10,
+    14,
   )
   currentLongitude = stepToward(
     currentLongitude,
     HOME_LNG + runDirLng * outside,
-    10,
+    14,
   )
 }
 
